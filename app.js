@@ -58,7 +58,7 @@ function loadCategories(){
 
   const area = document.getElementById("categoryArea");
 
-  area.innerHTML = "<h2>カテゴリ選択</h2>";
+  area.innerHTML = "<h2>カテゴリ選択(後期)</h2>";
 
   Object.keys(questionData).forEach(category => {
 
