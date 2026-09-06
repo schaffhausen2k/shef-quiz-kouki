@@ -32,15 +32,12 @@ const APP_CONTENT_VERSION = "20260906-kouki-1";
 
 
 const questionData = {
-  "まとめ問題（試験対策）": summaryExamQuestions,
-  "食品栄養学（栄養学）": eiyougakuQuestions ,
-  "食品栄養学（食品学）": syokuhingakuQuestions ,
-  "フードセーフティ論": foodsafetyQuestions ,
-  "ヘルシーライフ研究" : healthylifeQuestions ,
-  "調理理論・調理科学" : choririronQuestions , 
-  "世界の食通信"       : sekaiQuestions,
-  "ChatGPT出題予想"     : chatgptPredictedQuestions
-
+  "調理理論（グローバル）": globalChoririronQuestions,
+  "調理理論": choririronQuestions,
+  "フードセーフティ論": foodsafetyQuestions,
+  "食品栄養学（食品学）": syokuhingakuQuestions,
+  "食品栄養学（栄養学）": eiyougakuQuestions,
+  "ヘルシーライフ研究": healthylifeQuestions
 };
 
 let currentQuiz = 0;
@@ -168,6 +165,11 @@ function startQuiz(category){
   masteredQuestions = JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [];
 
   retryMode = false;
+
+  if(!questionData[category] || questionData[category].length === 0){
+    showAppNotice("このカテゴリの問題はまだ登録されていません", "info");
+    return;
+  }
 
   quizList = shuffle(
     questionData[category].filter(
