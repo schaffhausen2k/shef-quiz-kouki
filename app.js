@@ -1,4 +1,4 @@
-const APP_CONTENT_VERSION = "20260906-kouki-3";
+const APP_CONTENT_VERSION = "20260906-kouki-4";
 
 /*
   問題ファイル更新時のキャッシュ対策。
@@ -62,8 +62,6 @@ function loadCategories(){
     const btn = document.createElement("button");
 
     btn.className = "categoryBtn";
-    if(questionData[category] === summaryExamQuestions) btn.classList.add("summaryCategoryBtn");
-    if(questionData[category] === chatgptPredictedQuestions) btn.classList.add("predictedCategoryBtn");
 
     btn.innerText = category;
 
