@@ -1,4 +1,4 @@
-const APP_CONTENT_VERSION = "20260906-kouki-7";
+const APP_CONTENT_VERSION = "20260906-kouki-8";
 
 /*
   問題ファイル更新時のキャッシュ対策。
