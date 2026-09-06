@@ -15,6 +15,7 @@
 <!-- PASSWORD_GUARD_VERSION: 2026c1_fixed2 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>後期授業用クイズ</title>
 <link rel="manifest" href="manifest.json">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -135,7 +136,7 @@ body:not(.auth-locked) #passwordGate {
 */
 document.addEventListener('DOMContentLoaded', function () {
   const AUTH_VERSION = 'v1';
-  const AUTH_KEY = 'shefQuizAuthenticatedVersion';
+  const AUTH_KEY = 'koukiShefQuizAuthenticatedVersion';
   const PASSWORD_HASH = '8fdc980de40254731422ea0e5ca7711b1dbfdc1279aa105863bb4b7db79f100e';
 
   const body = document.body;
@@ -216,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
 (function () {
-  const KEY = 'shefQuizCacheCleanup_20260705_1';
+  const KEY = 'koukiShefQuizCacheCleanup_20260906_1';
   if (sessionStorage.getItem(KEY)) return;
   sessionStorage.setItem(KEY, '1');
   const jobs = [];
@@ -245,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <div id="passwordGate">
   <div class="password-card">
-    <h1>上期試験対策ツール<br>（一問一答式）</h1>
+    <h1>後期授業用クイズ<br>（一問一答式）</h1>
     <p>クラス共通のパスワードを入力してください。<br>一度入力すると、次回からは入力不要です。</p>
     <input type="password" id="passwordInput" placeholder="パスワード" autocomplete="current-password">
     <button id="loginBtn" type="button">入る</button>
@@ -304,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
 (async function bootstrapQuizApp(){
-  const VERSION_STORAGE_KEY = "shefQuizServerVersion";
+  const VERSION_STORAGE_KEY = "koukiShefQuizServerVersion";
   const CHECK_INTERVAL_MS = 5 * 60 * 1000;
   const assetFiles = [
     "data/eiyougaku.js",
