@@ -1,11 +1,11 @@
-const APP_CONTENT_VERSION = "20260713-2";
+const APP_CONTENT_VERSION = "20260906-kouki-1";
 
 /*
   問題ファイル更新時のキャッシュ対策。
   「覚えた問題」「間違えた問題」「成績」などのlocalStorageは削除しません。
 */
 (async function refreshQuestionFileCache() {
-  const versionKey = "quizAppContentVersion";
+  const versionKey = "koukiQuizAppContentVersion";
 
   if (localStorage.getItem(versionKey) === APP_CONTENT_VERSION) return;
 
@@ -46,8 +46,8 @@ const questionData = {
 let currentQuiz = 0;
 let score = 0;
 let quizList = [];
-let wrongQuestions = JSON.parse(localStorage.getItem("wrongQuestions")) || [];
-let masteredQuestions =  JSON.parse(localStorage.getItem("masteredQuestions")) || [];
+let wrongQuestions = JSON.parse(localStorage.getItem("koukiWrongQuestions")) || [];
+let masteredQuestions =  JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [];
 let retryMode = false;
 
 function shuffle(array){
@@ -150,7 +150,7 @@ clearMasterBtn.onclick = ()=>{
     onConfirm: () => {
       masteredQuestions = [];
       localStorage.setItem(
-        "masteredQuestions",
+        "koukiMasteredQuestions",
         JSON.stringify([])
       );
       showAppNotice("覚えた問題をすべて解除しました", "success");
@@ -165,7 +165,7 @@ area.appendChild(clearMasterBtn);
 
 function startQuiz(category){
 
-  masteredQuestions = JSON.parse(localStorage.getItem("masteredQuestions")) || [];
+  masteredQuestions = JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [];
 
   retryMode = false;
 
@@ -306,7 +306,7 @@ function submitAnswer(){
       );
 
     localStorage.setItem(
-      "wrongQuestions",
+      "koukiWrongQuestions",
       JSON.stringify(wrongQuestions)
     );
 
@@ -322,7 +322,7 @@ function submitAnswer(){
     wrongQuestions.push(quiz);
 
     localStorage.setItem(
-      "wrongQuestions",
+      "koukiWrongQuestions",
       JSON.stringify(wrongQuestions)
     );
 
@@ -448,7 +448,7 @@ function backToCategory(){
 function saveStats(isCorrect, quiz){
 
   let stats =
-    JSON.parse(localStorage.getItem("stats") || "{}");
+    JSON.parse(localStorage.getItem("koukiStats") || "{}");
 
   const key = quiz.question;
 
@@ -467,7 +467,7 @@ function saveStats(isCorrect, quiz){
     stats[key].wrong++;
   }
 
-  localStorage.setItem("stats", JSON.stringify(stats));
+  localStorage.setItem("koukiStats", JSON.stringify(stats));
 
   analyzeWeakQuestions();
 
@@ -476,7 +476,7 @@ function saveStats(isCorrect, quiz){
 function analyzeWeakQuestions(){
 
   const stats =
-    JSON.parse(localStorage.getItem("stats") || "{}");
+    JSON.parse(localStorage.getItem("koukiStats") || "{}");
 
   let weak = [];
 
@@ -491,7 +491,7 @@ function analyzeWeakQuestions(){
   });
 
   localStorage.setItem(
-    "weakQuestions",
+    "koukiWeakQuestions",
     JSON.stringify(weak)
   );
 
@@ -510,11 +510,11 @@ document.getElementById("themeToggle").onclick = ()=>{
   const isDark =
     document.body.classList.contains("dark");
 
-  localStorage.setItem("darkMode", isDark);
+  localStorage.setItem("koukiDarkMode", isDark);
 
 };
 
-if(localStorage.getItem("darkMode") === "true"){
+if(localStorage.getItem("koukiDarkMode") === "true"){
   document.body.classList.add("dark");
 }
 
@@ -768,7 +768,7 @@ function setupMasterButton(){
 
     // 念のため最新状態を取得
     masteredQuestions =
-      JSON.parse(localStorage.getItem("masteredQuestions")) || [];
+      JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [];
 
     // 既に覚えた問題なら解除
     if(masteredQuestions.includes(quiz.question)){
@@ -779,7 +779,7 @@ function setupMasterButton(){
         );
 
       localStorage.setItem(
-        "masteredQuestions",
+        "koukiMasteredQuestions",
         JSON.stringify(masteredQuestions)
       );
 
@@ -795,17 +795,17 @@ function setupMasterButton(){
     masteredQuestions = [...new Set(masteredQuestions)];
 
     localStorage.setItem(
-      "masteredQuestions",
+      "koukiMasteredQuestions",
       JSON.stringify(masteredQuestions)
     );
 
     // 間違えた問題一覧からも削除
     wrongQuestions =
-      (JSON.parse(localStorage.getItem("wrongQuestions")) || [])
+      (JSON.parse(localStorage.getItem("koukiWrongQuestions")) || [])
       .filter(q => q.question !== quiz.question);
 
     localStorage.setItem(
-      "wrongQuestions",
+      "koukiWrongQuestions",
       JSON.stringify(wrongQuestions)
     );
 
