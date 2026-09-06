@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>調理師学科試験対策</title>
+
+<style>
+body{
+    margin:0;
+    padding:20px;
+    font-family:sans-serif;
+    background:#f4f4f4;
+}
+
+.container{
+    max-width:600px;
+    margin:auto;
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align:center;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.choice{
+    background:#e0e0e0;
+}
+
+.choice:hover{
+    opacity:0.8;
+}
+.selected{
+    background:#90CAF9;
+}
+.correct{
+    background:#4CAF50;
+    color:white;
+}
+
+.wrong{
+    background:#f44336;
+    color:white;
+}
+
+.nextBtn{
+    background:#2196F3;
+    color:white;
+}
+
+.categoryBtn{
+    background:#673AB7;
+    color:white;
+}
+
+#score{
+    font-size:20px;
+    margin-top:20px;
+    text-align:center;
+}
+
+#explanation{
+    margin-top:15px;
+    background:#f9f9f9;
+    padding:10px;
+    border-left:5px solid #4CAF50;
+    line-height:1.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>調理師学科試験対策</h1>
+
+<div id="categoryArea"></div>
+
+<div id="quizArea" style="display:none;">
+
+<h2 id="categoryTitle"></h2>
+
+<div id="progress"></div>
+
+<h3 id="question"></h3>
+
+<div id="choices"></div>
+
+<div id="result"></div>
+
+<div id="explanation"></div>
+
+<button class="nextBtn"
+id="submitBtn"
+onclick="submitAnswer()">
+回答する
+</button>
+
+<button class="nextBtn"
+id="nextBtn"
+onclick="nextQuestion()"
+style="display:none;">
+次の問題へ
+</button>
+
+</div>
+
+<div id="score"></div>
+
+</div>
+
+<script src="questions.js"></script>
+
+<script>
+
+let currentQuiz = 0;
+let score = 0;
+let quizList = [];
+let wrongQuestions = [];
+
+function shuffle(array){
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function loadCategories(){
+
+    const categories = [...new Set(questions.map(q => q.category))];
+
+    const area = document.getElementById("categoryArea");
+
+    area.innerHTML = "<h2>カテゴリ選択</h2>";
+
+    categories.forEach(category => {
+
+        const btn = document.createElement("button");
+        btn.className = "categoryBtn";
+        btn.innerText = category;
+
+        btn.onclick = () => startQuiz(category);
+
+        area.appendChild(btn);
+
+    });
+
+}
+
+function startQuiz(category){
+
+    quizList = questions.filter(q => q.category === category);
+
+    quizList = shuffle(quizList);
+
+    currentQuiz = 0;
+    score = 0;
+    wrongQuestions = [];
+
+    document.getElementById("categoryArea").style.display = "none";
+    document.getElementById("quizArea").style.display = "block";
+
+    document.getElementById("categoryTitle").innerText = category;
+
+    loadQuiz();
+
+}
+
+function loadQuiz(){
+
+    document.getElementById("choices").innerHTML = "";
+    document.getElementById("nextBtn").style.display = "none";
+    document.getElementById("submitBtn").disabled = false;
+
+    document.getElementById("result").innerHTML = "";
+    document.getElementById("explanation").innerHTML = "";
+
+    const quiz = quizList[currentQuiz];
+
+    document.getElementById("progress").innerHTML =
+        `${currentQuiz + 1} / ${quizList.length}`;
+
+    document.getElementById("question").innerHTML = quiz.question;
+
+    const choicesDiv = document.getElementById("choices");
+
+    choicesDiv.innerHTML = "";
+
+    quiz.choices.forEach(choice => {
+
+        const btn = document.createElement("button");
+
+        btn.className = "choice";
+
+        btn.innerText = choice.text;
+
+        // ←ここ重要
+        btn.onclick = () => {
+            btn.classList.toggle("selected");
+        };
+
+        choicesDiv.appendChild(btn);
+
+    });
+
+}
+function submitAnswer(){
+
+    const quiz = quizList[currentQuiz];
+
+    const buttons = document.querySelectorAll(".choice");
+
+    let selectedChoices = [];
+
+    buttons.forEach((btn, index) => {
+
+        const choice = quiz.choices[index];
+
+        if(btn.classList.contains("selected")){
+            selectedChoices.push(choice.text);
+        }
+
+    });
+
+    const correctChoices = quiz.choices
+        .filter(c => c.correct)
+        .map(c => c.text);
+
+    const isCorrect =
+        selectedChoices.length === correctChoices.length &&
+        selectedChoices.every(c => correctChoices.includes(c));
+
+buttons.forEach((btn, index) => {
+
+    btn.disabled = true;
+
+    const choice = quiz.choices[index];
+
+    const wasSelected =
+        btn.classList.contains("selected");
+
+    btn.classList.remove("selected");
+
+    if(choice.correct){
+        btn.classList.add("correct");
+    }
+
+    if(wasSelected && !choice.correct){
+        btn.classList.add("wrong");
+    }
+
+});
+
+    if(isCorrect){
+
+        score++;
+
+        document.getElementById("result").innerHTML =
+            "⭕ 正解！";
+
+    }else{
+
+        wrongQuestions.push(quiz);
+
+        document.getElementById("result").innerHTML =
+            `❌ 不正解！`;
+    }
+
+    document.getElementById("explanation").innerHTML =
+        "<strong>解説：</strong><br>" +
+        quiz.choices
+            .filter(c => c.correct)
+            .map(c => "・" + c.explanation)
+            .join("<br>");
+
+    document.getElementById("nextBtn").style.display = "block";
+    document.getElementById("submitBtn").disabled = true;
+
+}
+
+function nextQuestion(){
+
+    currentQuiz++;
+
+    if(currentQuiz < quizList.length){
+
+        loadQuiz();
+
+    }else{
+
+        finishQuiz();
+
+    }
+
+}
+
+function finishQuiz(){
+
+    document.getElementById("quizArea").style.display = "none";
+
+    let html = `
+        <h2>終了！</h2>
+        <div id="score">
+        点数：${score} / ${quizList.length}<br>
+        正答率：${Math.round(score / quizList.length * 100)}%
+        </div>
+    `;
+
+    if(wrongQuestions.length > 0){
+
+        html += `
+        <button class="nextBtn" onclick="retryWrongQuestions()">
+            間違えた問題を復習
+        </button>
+        `;
+
+    }
+
+    html += `
+        <button class="categoryBtn" onclick="location.reload()">
+            カテゴリへ戻る
+        </button>
+    `;
+
+    document.querySelector(".container").innerHTML = html;
+
+}
+
+function retryWrongQuestions(){
+
+    quizList = shuffle(wrongQuestions);
+
+    currentQuiz = 0;
+    score = 0;
+    wrongQuestions = [];
+
+    document.querySelector(".container").innerHTML = `
+        <div id="quizArea">
+        <h2>復習モード</h2>
+
+        <div id="progress"></div>
+        <h3 id="question"></h3>
+        <div id="choices"></div>
+        <div id="result"></div>
+        <div id="explanation"></div>
+
+        <button class="nextBtn"
+        id="submitBtn"
+        onclick="submitAnswer()">
+        回答する
+        </button>
+
+        <button class="nextBtn"
+        id="nextBtn"
+        onclick="nextQuestion()"
+        style="display:none;">
+        次の問題へ
+        </button>
+
+        </div>
+    `;
+
+    loadQuiz();
+
+}
+loadCategories();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ELKN6ZGJD6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ELKN6ZGJD6');
+</script>
+
+<!-- PASSWORD_GUARD_VERSION: 2026c1_fixed2 -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css?v=20260705-1">
+<meta name="theme-color" content="#673AB7">
+
+<style>
+/* パスワードガード用 */
+body.auth-locked .container {
+  display: none !important;
+}
+
+#passwordGate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #ede7f6, #ffffff);
+}
+
+.password-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.14);
+  text-align: center;
+}
+
+.password-card h1 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  color: #4a148c;
+}
+
+.password-card p {
+  margin: 0 0 18px;
+  color: #555;
+  line-height: 1.6;
+}
+
+#passwordInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  font-size: 16px;
+  border: 2px solid #d1c4e9;
+  border-radius: 10px;
+  outline: none;
+}
+
+#passwordInput:focus {
+  border-color: #673AB7;
+}
+
+#loginBtn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  background: #673AB7;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#loginBtn:hover {
+  opacity: 0.9;
+}
+
+#passwordError {
+  min-height: 22px;
+  margin-top: 12px;
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+
+body.auth-locked #passwordGate {
+  display: flex !important;
+}
+
+body.auth-locked #themeToggle,
+body.auth-locked #quizArea,
+body.auth-locked #categoryArea,
+body.auth-locked #statsArea {
+  display: none !important;
+}
+
+body:not(.auth-locked) #passwordGate {
+  display: none !important;
+}
+</style>
+<script>
+/*
+  共通パスワード設定
+  現在のパスワード: xxxxxx
+
+  パスワードを変更する場合は、下の PASSWORD_HASH を新しいパスワードのSHA-256に変更し、
+  AUTH_VERSION も v2, v3... のように変更してください。
+  そうすると、すでに認証済みの人にも再入力を求められます。
+*/
+document.addEventListener('DOMContentLoaded', function () {
+  const AUTH_VERSION = 'v1';
+  const AUTH_KEY = 'shefQuizAuthenticatedVersion';
+  const PASSWORD_HASH = '8fdc980de40254731422ea0e5ca7711b1dbfdc1279aa105863bb4b7db79f100e';
+
+  const body = document.body;
+
+  function isAuthenticated() {
+    return localStorage.getItem(AUTH_KEY) === AUTH_VERSION;
+  }
+
+  function unlockApp() {
+    body.classList.remove('auth-locked');
+  }
+
+  function lockApp() {
+    body.classList.add('auth-locked');
+  }
+
+  async function sha256(text) {
+    const data = new TextEncoder().encode(text);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map(function (b) { return b.toString(16).padStart(2, '0'); })
+      .join('');
+  }
+
+  async function checkPassword() {
+    const input = document.getElementById('passwordInput');
+    const error = document.getElementById('passwordError');
+    const password = input.value;
+
+    error.textContent = '';
+
+    if (!password) {
+      error.textContent = 'パスワードを入力してください。';
+      return;
+    }
+
+    try {
+      const inputHash = await sha256(password);
+      if (inputHash === PASSWORD_HASH) {
+        localStorage.setItem(AUTH_KEY, AUTH_VERSION);
+        input.value = '';
+        unlockApp();
+      } else {
+        error.textContent = 'パスワードが違います。';
+        input.select();
+      }
+    } catch (e) {
+      error.textContent = 'このブラウザでは認証処理が使えません。Chromeなどで開いてください。';
+    }
+  }
+
+  if (isAuthenticated()) {
+    unlockApp();
+  } else {
+    lockApp();
+    setTimeout(function () {
+      const input = document.getElementById('passwordInput');
+      if (input) input.focus();
+    }, 100);
+  }
+
+  const loginBtn = document.getElementById('loginBtn');
+  const passwordInput = document.getElementById('passwordInput');
+
+  if (loginBtn) {
+    loginBtn.addEventListener('click', checkPassword);
+  }
+
+  if (passwordInput) {
+    passwordInput.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        checkPassword();
+      }
+    });
+  }
+});
+</script>
+
+<script>
+(function () {
+  const KEY = 'shefQuizCacheCleanup_20260705_1';
+  if (sessionStorage.getItem(KEY)) return;
+  sessionStorage.setItem(KEY, '1');
+  const jobs = [];
+  if ('serviceWorker' in navigator) {
+    jobs.push(navigator.serviceWorker.getRegistrations()
+      .then(rs => Promise.all(rs.map(r => r.unregister()))).catch(() => {}));
+  }
+  if ('caches' in window) {
+    jobs.push(caches.keys()
+      .then(ks => Promise.all(ks.map(k => caches.delete(k)))).catch(() => {}));
+  }
+  Promise.all(jobs).then(() => {
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) location.reload();
+  });
+})();
+</script>
+</head>
+<body class="auth-locked">
+
+<noscript>
+  <div style="padding:16px; color:#b00020; font-weight:bold; text-align:center;">
+    このアプリを使うにはJavaScriptを有効にしてください。
+  </div>
+</noscript>
+
+
+<div id="passwordGate">
+  <div class="password-card">
+    <h1>上期試験対策ツール<br>（一問一答式）</h1>
+    <p>クラス共通のパスワードを入力してください。<br>一度入力すると、次回からは入力不要です。</p>
+    <input type="password" id="passwordInput" placeholder="パスワード" autocomplete="current-password">
+    <button id="loginBtn" type="button">入る</button>
+    <p> <span style="color: red;">アプリの動作および問題データの保証は致しません。あくまで自己責任でご利用ください。<br>作者と面識のある方のみの利用を想定しています。</span></p>
+    <div id="passwordError" aria-live="polite"></div>
+  </div>
+</div>
+
+
+<div class="container">
+
+<div id="statsArea"></div>
+
+<div id="categoryArea"></div>
+
+<div id="quizArea" style="display:none;">
+
+<h2 id="categoryTitle"></h2>
+
+<div id="progress"></div>
+
+<h3 id="question"></h3>
+
+<div id="imageArea"></div>
+
+<div id="choices"></div>
+
+<div id="result"></div>
+
+<button class="nextBtn" id="submitBtn">回答する</button>
+
+<button class="nextBtn" id="nextBtn" style="display:none;">
+次の問題へ
+</button>
+<button id="masterBtn">
+✓ 覚えた
+</button>
+
+
+<div id="explanation"></div>
+
+<button class="backBtn" id="backCategoryBtn">
+カテゴリ選択へ戻る
+</button>
+
+
+
+</div>
+
+<button id="themeToggle">🌙 ダークモード</button>
+
+</div>
+
+
+<script src="data/eiyougaku.js?v=20260710-2"></script>
+<script src="data/syokuhingaku.js?v=20260710-2"></script>
+<script src="data/foodsafety.js?v=20260710-2"></script>
+<script src="data/healthylife.js?v=20260710-2"></script>
+<script src="data/choririron.js?v=20260710-2"></script>
+<script src="data/sekai.js?v=20260710-2"></script>
+<script src="app.js?v=20260710-2"></script>
+
+</body>
+</html>

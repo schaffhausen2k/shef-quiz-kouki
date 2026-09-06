@@ -1,0 +1,287 @@
+:root{
+  --bg:#f4f4f4;
+  --card:#ffffff;
+  --text:#222;
+}
+
+body.dark{
+  --bg:#1e1e1e;
+  --card:#252525;
+  --text:#f0f0f0;
+}
+
+body{
+  margin:0;
+  padding:20px;
+  font-family:sans-serif;
+  background:var(--bg);
+  color:var(--text);
+
+  transition:
+    background 0.3s,
+    color 0.3s;
+}
+
+.container{
+  max-width:700px;
+  margin:auto;
+  background:var(--card);
+  border-radius:15px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* ボタン共通 */
+button{
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+
+  border:none;
+  border-radius:10px;
+
+  font-size:16px;
+  cursor:pointer;
+
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.1s,
+    opacity 0.2s;
+}
+
+button:hover{
+  opacity:0.92;
+}
+
+/* 選択肢 */
+.choice{
+  background:#e0e0e0;
+  color:#222;
+  border:1px solid #ccc;
+
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.1s;
+}
+
+.choice:active{
+  transform:scale(0.98);
+}
+
+/* ダークモード時の選択肢 */
+body.dark .choice{
+  background:#2b2b2b;
+  color:#f5f5f5;
+  border:1px solid #555;
+}
+body.dark .correct{
+  background:#4CAF50 !important;
+  color:white !important;
+  border:2px solid #81C784 !important;
+}
+
+body.dark .wrong{
+  background:#f44336 !important;
+  color:white !important;
+  border:2px solid #EF9A9A !important;
+}
+body.dark .selected{
+  background:#2196F3 !important;
+  color:white !important;
+
+  border:2px solid #90CAF9 !important;
+
+  box-shadow:
+    0 0 0 2px rgba(144,202,249,0.25),
+    0 4px 12px rgba(0,0,0,0.4);
+
+  transform:scale(1.02);
+}
+
+/* 回答状態 */
+.selected{
+  background:#90CAF9;
+  border:2px solid #1976D2;
+}
+
+.correct{
+  background:#4CAF50;
+  color:white;
+}
+
+.wrong{
+  background:#f44336;
+  color:white;
+}
+
+/* ボタン */
+.nextBtn{
+  background:#2196F3;
+  color:white;
+}
+
+.categoryBtn{
+  background:#673AB7;
+  color:white;
+}
+
+.retryBtn{
+  display:block;
+  width:100%;
+
+  margin-top:30px;
+  padding:16px;
+
+  border:none;
+  border-radius:14px;
+
+  background:#ff9800;
+  color:white;
+
+  font-size:16px;
+  font-weight:bold;
+}
+
+body.dark .retryBtn{
+  background:#ffb74d;
+  color:#222;
+}
+
+.backBtn{
+  margin-top:20px;
+  background:#777;
+  color:white;
+}
+
+/* ダークモード切替ボタン */
+#themeToggle{
+
+  display:block;
+
+  width:100%;
+  max-width:250px;
+
+  margin:30px auto 0;
+
+  padding:12px 16px;
+
+  border:none;
+
+  border-radius:999px;
+
+  background:#673AB7;
+
+  color:white;
+
+  font-size:14px;
+
+  transition:0.2s;
+}
+
+/* 画像 */
+img{
+  max-width:100%;
+  border-radius:10px;
+}
+
+/* 解説 */
+.mainExplanation{
+  margin-top:10px;
+  padding:12px;
+
+  background:#f5f5f5;
+
+  border-radius:10px;
+}
+
+body.dark .mainExplanation{
+  background:#222;
+  color:#fff;
+
+  padding:15px;
+
+  border-radius:12px;
+
+  line-height:1.8;
+}
+
+.choiceExplanationTitle{
+  margin-top:15px;
+  font-size:18px;
+}
+
+body.dark .choiceExplanationTitle{
+  color:#ffd54f;
+  margin-top:20px;
+}
+
+.choiceExplanationItem{
+  margin-top:10px;
+  padding:10px;
+
+  border-radius:10px;
+
+  background:#fafafa;
+
+  line-height:1.6;
+}
+
+body.dark .choiceExplanationItem{
+  background:#2d2d2d;
+  color:#fff;
+
+  padding:12px;
+  margin-top:10px;
+
+  border-radius:10px;
+}
+body.dark .choice:hover{
+  background:#404040;
+  transform:translateY(-1px);
+}
+
+/* 間違えた選択肢は赤を優先 */
+.selected.wrong{
+  background:#f44336 !important;
+  color:white !important;
+  border:2px solid #EF9A9A !important;
+
+  box-shadow:
+    0 0 0 2px rgba(239,154,154,0.25),
+    0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* ダークモード時 */
+body.dark .selected.wrong{
+  background:#f44336 !important;
+  color:white !important;
+  border:2px solid #EF9A9A !important;
+}
+
+/* Windows Chrome / password gate layout fix */
+html, body { width:100%; min-height:100%; box-sizing:border-box; }
+*, *::before, *::after { box-sizing:inherit; }
+body.auth-locked { padding:0 !important; overflow-x:hidden; }
+body.auth-locked #passwordGate {
+  width:100%; min-height:100vh; min-height:100dvh; margin:0;
+}
+body:not(.auth-locked) #passwordGate {
+  display:none !important; pointer-events:none !important; visibility:hidden !important;
+}
+body:not(.auth-locked) .container { position:relative; z-index:1; }
+#backCategoryBtn { position:relative; z-index:5; pointer-events:auto; }
+
+
+.categoryBtn.predictedCategoryBtn{background:#00897B;color:white;font-weight:bold;}
+.categoryBtn.predictedCategoryBtn:hover{background:#00796B;opacity:1;}
+body.dark .categoryBtn.predictedCategoryBtn{background:#26A69A;color:#111;}
+
+
+/* まとめ問題（試験対策）カテゴリ専用 */
+.categoryBtn.summaryCategoryBtn{background:#C62828;color:white;font-weight:bold;border:2px solid #FFCDD2;}
+.categoryBtn.summaryCategoryBtn:hover{background:#B71C1C;opacity:1;}
+body.dark .categoryBtn.summaryCategoryBtn{background:#EF5350;color:#111;border-color:#FFCDD2;}

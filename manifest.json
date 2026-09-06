@@ -1,0 +1,10 @@
+
+{
+  "name":"調理師学科試験対策",
+  "short_name":"調理師Quiz",
+  "start_url":"./index.html",
+  "display":"standalone",
+  "background_color":"#ffffff",
+  "theme_color":"#673AB7",
+  "icons":[]
+}
