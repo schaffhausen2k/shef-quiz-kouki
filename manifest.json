@@ -1,9 +1,16 @@
 {
-  "name": "調理師科 後期授業用クイズアプリ",
-  "short_name": "後期Quiz",
+  "name": "大調非公式アプリ",
+  "short_name": "大調非公式アプリ",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#673AB7",
-  "icons": []
+  "icons": [
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
 }
