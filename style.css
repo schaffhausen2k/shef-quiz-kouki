@@ -1,13 +1,25 @@
 :root{
-  --bg:#f4f4f4;
+  --bg:#eef8f6;
   --card:#ffffff;
-  --text:#222;
+  --text:#18302d;
+  --muted:#607d78;
+  --border:#bfd8d3;
+  --primary:#00796b;
+  --primary-strong:#00695c;
+  --primary-soft:#d9efeb;
+  --accent:#f9a825;
 }
 
 body.dark{
-  --bg:#1e1e1e;
-  --card:#252525;
-  --text:#f0f0f0;
+  --bg:#101817;
+  --card:#182321;
+  --text:#f2f7f6;
+  --muted:#b5c8c4;
+  --border:#405652;
+  --primary:#4db6ac;
+  --primary-strong:#80cbc4;
+  --primary-soft:#203c38;
+  --accent:#ffd166;
 }
 
 body{
@@ -58,9 +70,9 @@ button:hover{
 
 /* 選択肢 */
 .choice{
-  background:#e0e0e0;
-  color:#222;
-  border:1px solid #ccc;
+  background:#e7f1ef;
+  color:#17312e;
+  border:1px solid #b8d1cc;
 
   transition:
     background 0.2s,
@@ -74,9 +86,9 @@ button:hover{
 
 /* ダークモード時の選択肢 */
 body.dark .choice{
-  background:#2b2b2b;
-  color:#f5f5f5;
-  border:1px solid #555;
+  background:#22302e;
+  color:#f4f8f7;
+  border:1px solid #4e6661;
 }
 body.dark .correct{
   background:#4CAF50 !important;
@@ -90,22 +102,20 @@ body.dark .wrong{
   border:2px solid #EF9A9A !important;
 }
 body.dark .selected{
-  background:#2196F3 !important;
+  background:#00695c !important;
   color:white !important;
-
-  border:2px solid #90CAF9 !important;
-
+  border:2px solid #80cbc4 !important;
   box-shadow:
-    0 0 0 2px rgba(144,202,249,0.25),
-    0 4px 12px rgba(0,0,0,0.4);
-
+    0 0 0 2px rgba(128,203,196,0.20),
+    0 4px 12px rgba(0,0,0,0.45);
   transform:scale(1.02);
 }
 
 /* 回答状態 */
 .selected{
-  background:#90CAF9;
-  border:2px solid #1976D2;
+  background:#b2dfdb;
+  color:#123c36;
+  border:2px solid #00796b;
 }
 
 .correct{
@@ -120,13 +130,31 @@ body.dark .selected{
 
 /* ボタン */
 .nextBtn{
-  background:#2196F3;
+  background:#0d7377;
   color:white;
+  font-weight:bold;
 }
 
 .categoryBtn{
-  background:#673AB7;
+  background:#00796b;
   color:white;
+  font-weight:bold;
+  border:1px solid #00695c;
+}
+
+.categoryBtn:hover{
+  background:#00695c;
+  opacity:1;
+}
+
+body.dark .categoryBtn{
+  background:#2b8c82;
+  color:#ffffff;
+  border-color:#66c2b8;
+}
+
+body.dark .categoryBtn:hover{
+  background:#36a397;
 }
 
 .retryBtn{
@@ -173,7 +201,7 @@ body.dark .retryBtn{
 
   border-radius:999px;
 
-  background:#673AB7;
+  background:#00796b;
 
   color:white;
 
@@ -192,20 +220,17 @@ img{
 .mainExplanation{
   margin-top:10px;
   padding:12px;
-
-  background:#f5f5f5;
-
+  background:#edf7f5;
+  border:1px solid #c6ded9;
   border-radius:10px;
 }
 
 body.dark .mainExplanation{
-  background:#222;
-  color:#fff;
-
+  background:#1e2d2a;
+  color:#f5f8f7;
+  border:1px solid #46615b;
   padding:15px;
-
   border-radius:12px;
-
   line-height:1.8;
 }
 
@@ -215,32 +240,29 @@ body.dark .mainExplanation{
 }
 
 body.dark .choiceExplanationTitle{
-  color:#ffd54f;
+  color:#ffd166;
   margin-top:20px;
 }
 
 .choiceExplanationItem{
   margin-top:10px;
   padding:10px;
-
   border-radius:10px;
-
-  background:#fafafa;
-
+  background:#f7fbfa;
+  border:1px solid #d5e6e2;
   line-height:1.6;
 }
 
 body.dark .choiceExplanationItem{
-  background:#2d2d2d;
-  color:#fff;
-
+  background:#22312e;
+  color:#f4f8f7;
+  border:1px solid #455f5a;
   padding:12px;
   margin-top:10px;
-
   border-radius:10px;
 }
 body.dark .choice:hover{
-  background:#404040;
+  background:#30433f;
   transform:translateY(-1px);
 }
 
@@ -285,3 +307,14 @@ body.dark .categoryBtn.predictedCategoryBtn{background:#26A69A;color:#111;}
 .categoryBtn.summaryCategoryBtn{background:#C62828;color:white;font-weight:bold;border:2px solid #FFCDD2;}
 .categoryBtn.summaryCategoryBtn:hover{background:#B71C1C;opacity:1;}
 body.dark .categoryBtn.summaryCategoryBtn{background:#EF5350;color:#111;border-color:#FFCDD2;}
+
+
+/* 後期アプリ専用カラーテーマ */
+h1, h2, h3{ color:var(--text); }
+body.dark .container{ box-shadow:0 5px 18px rgba(0,0,0,0.45); }
+.backBtn{ background:#546e7a; }
+body.dark .backBtn{ background:#607d8b; color:#fff; }
+.retryBtn{ background:#f9a825; color:#2b2100; }
+body.dark .retryBtn{ background:#ffd166; color:#251c00; }
+#themeToggle{ background:#00695c; color:#fff; border:1px solid #4db6ac; }
+body.dark #themeToggle{ background:#2b8c82; color:#fff; border-color:#80cbc4; }
