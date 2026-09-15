@@ -23,7 +23,6 @@
 <meta http-equiv="Expires" content="0">
 <link id="appStylesheet" rel="stylesheet" href="style.css">
 <meta name="theme-color" content="#00796b">
-
 <style>
 html.app-loading body:not(.auth-locked) .container { visibility: hidden !important; }
 html.app-loading body.auth-locked #passwordGate { visibility: visible !important; }
@@ -50,139 +49,32 @@ document.addEventListener('DOMContentLoaded', function () {
   function isAuthenticated(){ return localStorage.getItem(AUTH_KEY) === AUTH_VERSION; }
   function unlockApp(){ body.classList.remove('auth-locked'); }
   function lockApp(){ body.classList.add('auth-locked'); }
-  async function sha256(text){
-    const data = new TextEncoder().encode(text);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    return Array.from(new Uint8Array(hashBuffer)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
-  }
-  async function checkPassword(){
-    const input=document.getElementById('passwordInput');
-    const error=document.getElementById('passwordError');
-    const password=input.value;
-    error.textContent='';
-    if(!password){ error.textContent='パスワードを入力してください。'; return; }
-    try {
-      const inputHash=await sha256(password);
-      if(inputHash===PASSWORD_HASH){ localStorage.setItem(AUTH_KEY,AUTH_VERSION); input.value=''; unlockApp(); }
-      else { error.textContent='パスワードが違います。'; input.select(); }
-    } catch(e){ error.textContent='このブラウザでは認証処理が使えません。Chromeなどで開いてください。'; }
-  }
-  if(isAuthenticated()) unlockApp(); else { lockApp(); setTimeout(function(){ const input=document.getElementById('passwordInput'); if(input) input.focus(); },100); }
-  const loginBtn=document.getElementById('loginBtn');
-  const passwordInput=document.getElementById('passwordInput');
-  if(loginBtn) loginBtn.addEventListener('click',checkPassword);
-  if(passwordInput) passwordInput.addEventListener('keydown',function(event){ if(event.key==='Enter') checkPassword(); });
+  async function sha256(text){ const data=new TextEncoder().encode(text); const hashBuffer=await crypto.subtle.digest('SHA-256',data); return Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join(''); }
+  async function checkPassword(){ const input=document.getElementById('passwordInput'); const error=document.getElementById('passwordError'); const password=input.value; error.textContent=''; if(!password){error.textContent='パスワードを入力してください。';return;} try{const inputHash=await sha256(password); if(inputHash===PASSWORD_HASH){localStorage.setItem(AUTH_KEY,AUTH_VERSION);input.value='';unlockApp();}else{error.textContent='パスワードが違います。';input.select();}}catch(e){error.textContent='このブラウザでは認証処理が使えません。Chromeなどで開いてください。';} }
+  if(isAuthenticated()) unlockApp(); else {lockApp();setTimeout(function(){const input=document.getElementById('passwordInput');if(input)input.focus();},100);}
+  const loginBtn=document.getElementById('loginBtn'); const passwordInput=document.getElementById('passwordInput'); if(loginBtn)loginBtn.addEventListener('click',checkPassword); if(passwordInput)passwordInput.addEventListener('keydown',function(event){if(event.key==='Enter')checkPassword();});
 });
 </script>
 <script>
-(function(){
-  const KEY='koukiShefQuizCacheCleanup_20260906_1';
-  if(sessionStorage.getItem(KEY)) return;
-  sessionStorage.setItem(KEY,'1');
-  const jobs=[];
-  if('serviceWorker' in navigator) jobs.push(navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.map(r=>r.unregister()))).catch(()=>{}));
-  if('caches' in window) jobs.push(caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).catch(()=>{}));
-  Promise.all(jobs).then(()=>{ if(navigator.serviceWorker && navigator.serviceWorker.controller) location.reload(); });
-})();
+(function(){const KEY='koukiShefQuizCacheCleanup_20260906_1';if(sessionStorage.getItem(KEY))return;sessionStorage.setItem(KEY,'1');const jobs=[];if('serviceWorker'in navigator)jobs.push(navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.map(r=>r.unregister()))).catch(()=>{}));if('caches'in window)jobs.push(caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).catch(()=>{}));Promise.all(jobs).then(()=>{if(navigator.serviceWorker&&navigator.serviceWorker.controller)location.reload();});})();
 </script>
 </head>
 <body class="auth-locked">
 <noscript><div style="padding:16px;color:#b00020;font-weight:bold;text-align:center;">このアプリを使うにはJavaScriptを有効にしてください。</div></noscript>
-<div id="passwordGate">
-  <div class="password-card">
-    <h1>後期試験対策<br>（一問一答式）</h1>
-    <p>クラス共通のパスワードを入力してください。<br>一度入力すると、次回からは入力不要です。</p>
-    <input type="password" id="passwordInput" placeholder="パスワード" autocomplete="current-password">
-    <button id="loginBtn" type="button">入る</button>
-    <p><span style="color:red;">アプリの動作および問題データの保証は致しません。あくまで自己責任でご利用ください。<br>作者と面識のある方のみの利用を想定しています。</span></p>
-    <div id="passwordError" aria-live="polite"></div>
-  </div>
-</div>
-<div class="container">
-  <div id="statsArea"></div>
-  <div id="categoryArea"></div>
-  <div id="quizArea" style="display:none;">
-    <h2 id="categoryTitle"></h2>
-    <div id="progress"></div>
-    <h3 id="question"></h3>
-    <div id="imageArea"></div>
-    <div id="choices"></div>
-    <div id="result"></div>
-    <button class="nextBtn" id="submitBtn">回答する</button>
-    <button class="nextBtn" id="nextBtn" style="display:none;">次の問題へ</button>
-    <button id="masterBtn">✓ 覚えた</button>
-    <div id="explanation"></div>
-    <button class="backBtn" id="backCategoryBtn">カテゴリ選択へ戻る</button>
-  </div>
-  <button id="themeToggle">🌙 ダークモード</button>
-</div>
+<div id="passwordGate"><div class="password-card"><h1>後期試験対策<br>（一問一答式）</h1><p>クラス共通のパスワードを入力してください。<br>一度入力すると、次回からは入力不要です。</p><input type="password" id="passwordInput" placeholder="パスワード" autocomplete="current-password"><button id="loginBtn" type="button">入る</button><p><span style="color:red;">アプリの動作および問題データの保証は致しません。あくまで自己責任でご利用ください。<br>作者と面識のある方のみの利用を想定しています。</span></p><div id="passwordError" aria-live="polite"></div></div></div>
+<div class="container"><div id="statsArea"></div><div id="categoryArea"></div><div id="quizArea" style="display:none;"><h2 id="categoryTitle"></h2><div id="progress"></div><h3 id="question"></h3><div id="imageArea"></div><div id="choices"></div><div id="result"></div><button class="nextBtn" id="submitBtn">回答する</button><button class="nextBtn" id="nextBtn" style="display:none;">次の問題へ</button><button id="masterBtn">✓ 覚えた</button><div id="explanation"></div><button class="backBtn" id="backCategoryBtn">カテゴリ選択へ戻る</button></div><button id="themeToggle">🌙 ダークモード</button></div>
 <script>
 (async function bootstrapQuizApp(){
-  const VERSION_STORAGE_KEY="koukiShefQuizServerVersion";
-  const CHECK_INTERVAL_MS=5*60*1000;
-  const assetFiles=[
-    "data/eiyougaku.js",
-    "data/syokuhingaku.js",
-    "data/syokuhingaku_20260915_dairy19.js",
-    "data/foodsafety.js",
-    "data/healthylife.js",
-    "data/choririron_global.js",
-    "data/choririron.js",
-    "data/choririron_20260915_20.js",
-    "data/choririron_20260915_energy20.js",
-    "app.js"
-  ];
-  async function getServerVersion(){
-    const response=await fetch(`version.json?t=${Date.now()}`,{cache:"no-store",headers:{"Cache-Control":"no-cache"}});
-    if(!response.ok) throw new Error(`version.json: ${response.status}`);
-    const data=await response.json();
-    if(!data.version) throw new Error("versionが設定されていません");
-    return String(data.version);
-  }
-  async function clearBrowserCaches(){
-    try {
-      if("serviceWorker" in navigator){ const registrations=await navigator.serviceWorker.getRegistrations(); await Promise.all(registrations.map(registration=>registration.unregister())); }
-      if("caches" in window){ const names=await caches.keys(); await Promise.all(names.map(name=>caches.delete(name))); }
-    } catch(error){ console.warn("キャッシュ削除に失敗しました",error); }
-  }
-  function loadScript(src){
-    return new Promise((resolve,reject)=>{
-      const script=document.createElement("script"); script.src=src; script.async=false; script.onload=resolve; script.onerror=()=>reject(new Error(`${src} を読み込めませんでした`)); document.body.appendChild(script);
-    });
-  }
-  let serverVersion;
-  try { serverVersion=await getServerVersion(); }
-  catch(error){ console.warn("更新番号を取得できなかったため、保存済み番号で起動します",error); serverVersion=localStorage.getItem(VERSION_STORAGE_KEY)||"fallback-1"; }
-  const savedVersion=localStorage.getItem(VERSION_STORAGE_KEY);
-  if(savedVersion && savedVersion!==serverVersion) await clearBrowserCaches();
-  window.__APP_SERVER_VERSION__=serverVersion;
-  const encodedVersion=encodeURIComponent(serverVersion);
-  const stylesheet=document.getElementById("appStylesheet");
-  if(stylesheet) stylesheet.href=`style.css?v=${encodedVersion}`;
-  try {
-    for(const file of assetFiles) await loadScript(`${file}?v=${encodedVersion}`);
-    localStorage.setItem(VERSION_STORAGE_KEY,serverVersion);
-    requestAnimationFrame(()=>{ document.documentElement.classList.remove("app-loading"); });
-  } catch(error){
-    console.error(error);
-    document.body.insertAdjacentHTML("afterbegin",'<div style="padding:14px;background:#b71c1c;color:white;text-align:center;font-weight:bold;">最新版の読み込みに失敗しました。通信状態を確認して再読み込みしてください。</div>');
-    document.documentElement.classList.remove("app-loading"); return;
-  }
-  let checking=false;
-  async function checkForServerUpdate(){
-    if(checking) return; checking=true;
-    try {
-      const latestVersion=await getServerVersion();
-      if(latestVersion!==serverVersion){
-        await clearBrowserCaches(); localStorage.setItem(VERSION_STORAGE_KEY,latestVersion);
-        const url=new URL(location.href); url.searchParams.set("appVersion",latestVersion); location.replace(url.toString());
-      }
-    } catch(error){ console.warn("更新確認に失敗しました",error); }
-    finally { checking=false; }
-  }
-  document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") checkForServerUpdate(); });
-  window.addEventListener("pageshow",checkForServerUpdate);
-  setInterval(checkForServerUpdate,CHECK_INTERVAL_MS);
+  const VERSION_STORAGE_KEY="koukiShefQuizServerVersion"; const CHECK_INTERVAL_MS=5*60*1000;
+  const assetFiles=["data/eiyougaku.js","data/syokuhingaku.js","data/syokuhingaku_20260915_dairy19.js","data/foodsafety.js","data/healthylife.js","data/healthylife_20260915_workenv10.js","data/choririron_global.js","data/choririron.js","data/choririron_20260915_20.js","data/choririron_20260915_energy20.js","app.js"];
+  async function getServerVersion(){const response=await fetch(`version.json?t=${Date.now()}`,{cache:"no-store",headers:{"Cache-Control":"no-cache"}});if(!response.ok)throw new Error(`version.json: ${response.status}`);const data=await response.json();if(!data.version)throw new Error("versionが設定されていません");return String(data.version);}
+  async function clearBrowserCaches(){try{if("serviceWorker"in navigator){const registrations=await navigator.serviceWorker.getRegistrations();await Promise.all(registrations.map(registration=>registration.unregister()));}if("caches"in window){const names=await caches.keys();await Promise.all(names.map(name=>caches.delete(name)));}}catch(error){console.warn("キャッシュ削除に失敗しました",error);}}
+  function loadScript(src){return new Promise((resolve,reject)=>{const script=document.createElement("script");script.src=src;script.async=false;script.onload=resolve;script.onerror=()=>reject(new Error(`${src} を読み込めませんでした`));document.body.appendChild(script);});}
+  let serverVersion;try{serverVersion=await getServerVersion();}catch(error){console.warn("更新番号を取得できなかったため、保存済み番号で起動します",error);serverVersion=localStorage.getItem(VERSION_STORAGE_KEY)||"fallback-1";}
+  const savedVersion=localStorage.getItem(VERSION_STORAGE_KEY);if(savedVersion&&savedVersion!==serverVersion)await clearBrowserCaches();window.__APP_SERVER_VERSION__=serverVersion;const encodedVersion=encodeURIComponent(serverVersion);const stylesheet=document.getElementById("appStylesheet");if(stylesheet)stylesheet.href=`style.css?v=${encodedVersion}`;
+  try{for(const file of assetFiles)await loadScript(`${file}?v=${encodedVersion}`);localStorage.setItem(VERSION_STORAGE_KEY,serverVersion);requestAnimationFrame(()=>{document.documentElement.classList.remove("app-loading");});}catch(error){console.error(error);document.body.insertAdjacentHTML("afterbegin",'<div style="padding:14px;background:#b71c1c;color:white;text-align:center;font-weight:bold;">最新版の読み込みに失敗しました。通信状態を確認して再読み込みしてください。</div>');document.documentElement.classList.remove("app-loading");return;}
+  let checking=false;async function checkForServerUpdate(){if(checking)return;checking=true;try{const latestVersion=await getServerVersion();if(latestVersion!==serverVersion){await clearBrowserCaches();localStorage.setItem(VERSION_STORAGE_KEY,latestVersion);const url=new URL(location.href);url.searchParams.set("appVersion",latestVersion);location.replace(url.toString());}}catch(error){console.warn("更新確認に失敗しました",error);}finally{checking=false;}}
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")checkForServerUpdate();});window.addEventListener("pageshow",checkForServerUpdate);setInterval(checkForServerUpdate,CHECK_INTERVAL_MS);
 })();
 </script>
 </body>
