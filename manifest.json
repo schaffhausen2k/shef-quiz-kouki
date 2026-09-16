@@ -1,6 +1,6 @@
 {
-  "name": "大調非公式アプリ",
-  "short_name": "大調非公式アプリ",
+  "name": "大調非公認アプリ",
+  "short_name": "大調非公認アプリ",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#eef8f6",
