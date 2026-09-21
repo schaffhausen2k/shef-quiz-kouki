@@ -1,4 +1,4 @@
-const APP_CONTENT_VERSION = "20260908-kouki-13";
+const APP_CONTENT_VERSION = "20260921-kouki-14";
 
 /*
   問題ファイル更新時のキャッシュ対策。
@@ -46,6 +46,7 @@ let quizList = [];
 let wrongQuestions = JSON.parse(localStorage.getItem("koukiWrongQuestions")) || [];
 let masteredQuestions =  JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [];
 let retryMode = false;
+let currentChoiceOrder = [];
 
 function shuffle(array){
   return [...array].sort(() => Math.random() - 0.5);
@@ -228,11 +229,16 @@ function loadQuiz(){
 
   choicesDiv.innerHTML = "";
 
-  quiz.choices.forEach((choice,index)=>{
+  // 選択肢は出題のたびにランダム表示する。
+  // 値には元データ上の選択肢番号を保持し、正誤判定・解説との対応を崩さない。
+  currentChoiceOrder = shuffle(quiz.choices.map((choice, originalIndex) => ({ choice, originalIndex })));
+
+  currentChoiceOrder.forEach(({choice, originalIndex})=>{
 
     const btn = document.createElement("button");
 
     btn.className = "choice";
+    btn.dataset.originalIndex = String(originalIndex);
 
     btn.innerText = choice;
 
@@ -266,10 +272,10 @@ function submitAnswer(){
 
   let selected = [];
 
-  buttons.forEach((btn,index)=>{
+  buttons.forEach((btn)=>{
 
     if(btn.classList.contains("selected")){
-      selected.push(index);
+      selected.push(Number(btn.dataset.originalIndex));
     }
 
   });
@@ -278,16 +284,17 @@ function submitAnswer(){
     selected.length === quiz.answer.length &&
     selected.every(i=>quiz.answer.includes(i));
 
-  buttons.forEach((btn,index)=>{
+  buttons.forEach((btn)=>{
 
     btn.disabled = true;
+    const originalIndex = Number(btn.dataset.originalIndex);
 
-    if(quiz.answer.includes(index)){
+    if(quiz.answer.includes(originalIndex)){
       btn.classList.add("correct");
     }
 
     if(btn.classList.contains("selected") &&
-      !quiz.answer.includes(index)){
+      !quiz.answer.includes(originalIndex)){
       btn.classList.add("wrong");
     }
 
