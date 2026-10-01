@@ -243,13 +243,20 @@ function loadQuiz(){
     btn.innerText = choice;
 
     btn.onclick = ()=>{
-      btn.classList.toggle("selected");
+      // 後期問題はすべて一択。選択した瞬間に採点する。
+      if(btn.disabled) return;
+      document.querySelectorAll(".choice").forEach(choiceBtn => {
+        choiceBtn.classList.remove("selected");
+      });
+      btn.classList.add("selected");
+      submitAnswer();
     };
 
     choicesDiv.appendChild(btn);
 
   });
-document.getElementById("submitBtn").style.display = "block";
+// 後期問題は選択肢を押した瞬間に採点するため「回答する」ボタンは表示しない。
+document.getElementById("submitBtn").style.display = "none";
 
 document.getElementById("nextBtn").style.display = "none";
 
@@ -261,6 +268,8 @@ if(masteredQuestions.includes(quiz.question)){
 }else{
   masterBtn.innerText = "✓ 覚えた";
 }
+// 「覚えた」は採点後だけ表示する。
+masterBtn.style.display = "none";
 
 }
 
@@ -379,6 +388,7 @@ function submitAnswer(){
 document.getElementById("submitBtn").style.display = "none";
 
 document.getElementById("nextBtn").style.display = "block";
+document.getElementById("masterBtn").style.display = "block";
 
 }
 
