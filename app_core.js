@@ -354,7 +354,7 @@ function submitAnswer(){
   let explanationHTML = `
     <div class="mainExplanation">
       <strong>解説</strong><br>
-      ${(quiz.explanation || "").replace(/^正解です。[\\s　]*/, "")}
+      ${(quiz.explanation || "").replace(/^正解です[。！!][\\s　]*/, "")}
     </div>
   `;
 
