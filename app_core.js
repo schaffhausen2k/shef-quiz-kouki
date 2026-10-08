@@ -259,6 +259,7 @@ function loadQuiz(){
 document.getElementById("submitBtn").style.display = "none";
 
 document.getElementById("nextBtn").style.display = "none";
+document.getElementById("nextBtnBottom").style.display = "none";
 
 const masterBtn =
   document.getElementById("masterBtn");
@@ -388,6 +389,7 @@ function submitAnswer(){
 document.getElementById("submitBtn").style.display = "none";
 
 document.getElementById("nextBtn").style.display = "block";
+document.getElementById("nextBtnBottom").style.display = "block";
 document.getElementById("masterBtn").style.display = "block";
 
 }
@@ -429,6 +431,7 @@ function finishQuiz(){
 
   document.getElementById("submitBtn").style.display = "none";
   document.getElementById("nextBtn").style.display = "none";
+document.getElementById("nextBtnBottom").style.display = "none";
   document.getElementById("masterBtn").style.display = "none";
   document.getElementById("backCategoryBtn").style.display = "block";
 }
@@ -450,6 +453,7 @@ function backToCategory(){
 
   document.getElementById("submitBtn").style.display = "none";
   document.getElementById("nextBtn").style.display = "none";
+document.getElementById("nextBtnBottom").style.display = "none";
   document.getElementById("masterBtn").style.display = "none";
   document.getElementById("backCategoryBtn").style.display = "none";
 
@@ -519,6 +523,12 @@ document.getElementById("submitBtn").onclick =
 
 document.getElementById("nextBtn").onclick =
   nextQuestion;
+
+// 解説を読み終えた位置から次へ進み、次の問題の先頭を表示する。
+document.getElementById("nextBtnBottom").onclick = () => {
+  nextQuestion();
+  window.scrollTo({ top: 0, behavior: "auto" });
+};
 
 document.getElementById("themeToggle").onclick = ()=>{
 
