@@ -350,7 +350,8 @@ function submitAnswer(){
       </div>
     `;
 
-    quiz.choices.forEach((choice,index)=>{
+    // 出題時の表示順を使い、正解・解説は元の選択肢番号で参照する。
+    currentChoiceOrder.forEach(({choice, originalIndex: index})=>{
 
       const mark =
         quiz.answer.includes(index) ? "⭕" : "❌";
