@@ -31,6 +31,23 @@ let masteredQuestions =  JSON.parse(localStorage.getItem("koukiMasteredQuestions
 let retryMode = false;
 let currentChoiceOrder = [];
 
+// この端末での設定を保持。未設定時はオフ。
+const AUTO_MASTER_KEY = "koukiAutoMasterOnCorrect";
+function setupAutoMasterSetting(){
+  const toggle = document.getElementById("autoMasterToggle");
+  const status = document.getElementById("autoMasterStatus");
+  toggle.checked = localStorage.getItem(AUTO_MASTER_KEY) === "true";
+  const updateStatus = () => {
+    status.textContent = "自動で覚えた：" + (toggle.checked ? "オン" : "オフ");
+  };
+  updateStatus();
+  toggle.addEventListener("change", () => {
+    localStorage.setItem(AUTO_MASTER_KEY, String(toggle.checked));
+    updateStatus();
+  });
+}
+
+
 function shuffle(array){
   return [...array].sort(() => Math.random() - 0.5);
 }
@@ -252,6 +269,7 @@ if(masteredQuestions.includes(quiz.question)){
 }else{
   masterBtn.innerText = "✓ 覚えた";
 }
+masterBtn.setAttribute("aria-pressed", String(masteredQuestions.includes(quiz.question)));
 // 「覚えた」は採点後だけ表示する。
 masterBtn.style.display = "none";
 
@@ -293,9 +311,17 @@ function submitAnswer(){
 
   });
 
+  let automaticallyMastered = false;
+
   if(isCorrect){
 
   score++;
+
+  if(localStorage.getItem(AUTO_MASTER_KEY) === "true"){
+    markQuestionMastered(quiz);
+    automaticallyMastered = true;
+  }
+
 
   // 再挑戦モードなら卒業
   if(retryMode){
@@ -334,6 +360,12 @@ function submitAnswer(){
 
   document.getElementById("result").innerHTML =
     isCorrect ? "⭕ 正解" : "❌ 不正解";
+
+  if(automaticallyMastered){
+    document.getElementById("result").innerHTML +=
+      '<div class="auto-master-notice">✓ 自動で「覚えた」に登録しました。下の「覚えた済み」で解除できます。</div>';
+  }
+
 
   let explanationHTML = `
     <div class="mainExplanation">
@@ -553,6 +585,7 @@ if ("serviceWorker" in navigator) {
     .catch(() => {});
 }
 
+setupAutoMasterSetting();
 loadCategories();
 setupMasterButton();
 
@@ -770,6 +803,22 @@ function showBackCategoryDialog(){
   document.getElementById("confirmBackCategoryBtn").focus();
 }
 
+// 自動・手動で同じ保存処理を使い、現在の問題と解説は表示したままにする。
+function markQuestionMastered(quiz){
+  masteredQuestions = JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [];
+  masteredQuestions = [...new Set([...masteredQuestions, quiz.question])];
+  localStorage.setItem("koukiMasteredQuestions", JSON.stringify(masteredQuestions));
+
+  wrongQuestions = (JSON.parse(localStorage.getItem("koukiWrongQuestions")) || [])
+    .filter(q => q.question !== quiz.question);
+  localStorage.setItem("koukiWrongQuestions", JSON.stringify(wrongQuestions));
+
+  quizList = quizList.filter((q, index) => index <= currentQuiz || q.question !== quiz.question);
+  const masterBtn = document.getElementById("masterBtn");
+  masterBtn.innerText = "✓ 覚えた済み";
+  masterBtn.setAttribute("aria-pressed", "true");
+}
+
 function setupMasterButton(){
 
   document.getElementById("masterBtn").onclick = ()=>{
@@ -797,37 +846,12 @@ function setupMasterButton(){
       document.getElementById("masterBtn").innerText =
         "✓ 覚えた";
 
+      document.getElementById("masterBtn").setAttribute("aria-pressed", "false");
       showAppNotice("覚えた登録を解除しました", "info");
       return;
     }
 
-    // 未登録なら覚えた登録（重複防止）
-    masteredQuestions.push(quiz.question);
-    masteredQuestions = [...new Set(masteredQuestions)];
-
-    localStorage.setItem(
-      "koukiMasteredQuestions",
-      JSON.stringify(masteredQuestions)
-    );
-
-    // 間違えた問題一覧からも削除
-    wrongQuestions =
-      (JSON.parse(localStorage.getItem("koukiWrongQuestions")) || [])
-      .filter(q => q.question !== quiz.question);
-
-    localStorage.setItem(
-      "koukiWrongQuestions",
-      JSON.stringify(wrongQuestions)
-    );
-
-    // 現在位置より後ろに同じ問題が残っていれば除外
-    quizList = quizList.filter(
-      (q, index) =>
-        index <= currentQuiz || q.question !== quiz.question
-    );
-
-    document.getElementById("masterBtn").innerText =
-      "✓ 覚えた済み";
+    markQuestionMastered(quiz);
 
     showAppNotice("覚えた問題に登録しました", "success");
   };

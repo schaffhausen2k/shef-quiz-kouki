@@ -318,3 +318,72 @@ body.dark .backBtn{ background:#607d8b; color:#fff; }
 body.dark .retryBtn{ background:#ffd166; color:#251c00; }
 #themeToggle{ background:#00695c; color:#fff; border:1px solid #4db6ac; }
 body.dark #themeToggle{ background:#2b8c82; color:#fff; border-color:#80cbc4; }
+
+/* 出題中も利用できる学習設定 */
+.quiz-settings{
+  margin-bottom:16px;
+  padding:12px 14px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--primary-soft);
+}
+.quiz-settings summary{
+  cursor:pointer;
+  min-height:28px;
+  line-height:1.7;
+  font-weight:bold;
+}
+.settings-status{
+  display:inline-block;
+  margin-left:8px;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:normal;
+}
+.auto-master-setting{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  min-height:48px;
+  margin-top:10px;
+  cursor:pointer;
+  line-height:1.6;
+}
+.auto-master-setting input{
+  appearance:none;
+  -webkit-appearance:none;
+  flex-shrink:0;
+  width:48px;
+  height:28px;
+  margin:0;
+  padding:3px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:#7a8c88;
+  cursor:pointer;
+}
+.auto-master-setting input::before{
+  content:"";
+  display:block;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:white;
+  transition:transform .15s;
+}
+.auto-master-setting input:checked{background:var(--primary);}
+.auto-master-setting input:checked::before{transform:translateX(20px);}
+.auto-master-setting input:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
+#autoMasterHelp{
+  margin:8px 0 0;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.7;
+}
+.auto-master-notice{
+  margin-top:8px;
+  color:var(--primary-strong);
+  font-size:14px;
+  line-height:1.6;
+}
