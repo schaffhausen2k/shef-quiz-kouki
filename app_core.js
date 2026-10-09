@@ -58,7 +58,13 @@ function shuffle(array){
   return [...array].sort(() => Math.random() - 0.5);
 }
 
+function setSettingsVisible(visible){
+  const settings = document.getElementById("quizSettings");
+  if(settings) settings.style.display = visible ? "" : "none";
+}
+
 function loadCategories(){
+  setSettingsVisible(true);
 
   const area = document.getElementById("categoryArea");
 
@@ -202,6 +208,7 @@ function startQuiz(category){
 }
 
 function loadQuiz(){
+  setSettingsVisible(false);
 
   const quiz = quizList[currentQuiz];
 
@@ -317,15 +324,12 @@ function submitAnswer(){
 
   });
 
-  let automaticallyMastered = false;
-
   if(isCorrect){
 
   score++;
 
   if(localStorage.getItem(AUTO_MASTER_KEY) === "true"){
     markQuestionMastered(quiz);
-    automaticallyMastered = true;
   }
 
 
@@ -367,10 +371,6 @@ function submitAnswer(){
   document.getElementById("result").innerHTML =
     isCorrect ? "⭕ 正解" : "❌ 不正解";
 
-  if(automaticallyMastered){
-    document.getElementById("result").innerHTML +=
-      '<div class="auto-master-notice">✓ 自動で「覚えた」に登録しました。下の「覚えた済み」で解除できます。</div>';
-  }
 
 
   let explanationHTML = `
