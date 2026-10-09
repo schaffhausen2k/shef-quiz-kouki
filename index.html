@@ -71,7 +71,11 @@ document.addEventListener('DOMContentLoaded', function () {
     <input type="checkbox" id="autoMasterToggle" role="switch" aria-describedby="autoMasterHelp">
   </label>
   <p id="autoMasterHelp">オンにすると、正解した問題は次回の出題から外れます。途中でも変更でき、次の採点から適用されます。自動登録後も「覚えた済み」ボタンで解除できます。</p>
-</details><div id="statsArea"></div><div id="categoryArea"></div><div id="quizArea" style="display:none;"><h2 id="categoryTitle"></h2><div id="progress"></div><h3 id="question"></h3><div id="imageArea"></div><div id="choices"></div><div id="result"></div><button class="nextBtn" id="submitBtn">回答する</button><button id="masterBtn">✓ 覚えた</button><button class="nextBtn" id="nextBtn" style="display:none;">次の問題へ</button><div id="explanation"></div><button class="nextBtn" id="nextBtnBottom" style="display:none;">次の問題へ</button><button class="backBtn" id="backCategoryBtn">カテゴリ選択へ戻る</button></div><button id="themeToggle">🌙 ダークモード</button></div>
+<label class="auto-master-setting" for="darkModeToggle">
+    <span>ダークモード</span>
+    <input type="checkbox" id="darkModeToggle" role="switch">
+  </label>
+</details><div id="statsArea"></div><div id="categoryArea"></div><div id="quizArea" style="display:none;"><h2 id="categoryTitle"></h2><div id="progress"></div><h3 id="question"></h3><div id="imageArea"></div><div id="choices"></div><div id="result"></div><button class="nextBtn" id="submitBtn">回答する</button><button id="masterBtn">✓ 覚えた</button><button class="nextBtn" id="nextBtn" style="display:none;">次の問題へ</button><div id="explanation"></div><button class="nextBtn" id="nextBtnBottom" style="display:none;">次の問題へ</button><button class="backBtn" id="backCategoryBtn">カテゴリ選択へ戻る</button></div></div>
 <script>
 (async function bootstrapQuizApp(){
   const VERSION_STORAGE_KEY="koukiShefQuizServerVersion"; const CHECK_INTERVAL_MS=5*60*1000;

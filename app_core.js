@@ -54,6 +54,25 @@ function setupAutoMasterSetting(){
 }
 
 
+function setupDarkModeSetting(){
+  // 旧画面が残っていても、独立ボタンを削除し設定内にスイッチを補う。
+  const legacyButton = document.getElementById("themeToggle");
+  if(legacyButton) legacyButton.remove();
+  const settings = document.getElementById("quizSettings");
+  if(settings && !document.getElementById("darkModeToggle")){
+    settings.insertAdjacentHTML("beforeend", "<label class=\"auto-master-setting\" for=\"darkModeToggle\">\n    <span>ダークモード</span>\n    <input type=\"checkbox\" id=\"darkModeToggle\" role=\"switch\">\n  </label>");
+  }
+  const toggle = document.getElementById("darkModeToggle");
+  const isDark = localStorage.getItem("koukiDarkMode") === "true";
+  document.body.classList.toggle("dark", isDark);
+  if(!toggle) return;
+  toggle.checked = isDark;
+  toggle.addEventListener("change", () => {
+    document.body.classList.toggle("dark", toggle.checked);
+    localStorage.setItem("koukiDarkMode", String(toggle.checked));
+  });
+}
+
 function shuffle(array){
   return [...array].sort(() => Math.random() - 0.5);
 }
@@ -552,21 +571,6 @@ document.getElementById("nextBtnBottom").onclick = () => {
   window.scrollTo({ top: 0, behavior: "auto" });
 };
 
-document.getElementById("themeToggle").onclick = ()=>{
-
-  document.body.classList.toggle("dark");
-
-  const isDark =
-    document.body.classList.contains("dark");
-
-  localStorage.setItem("koukiDarkMode", isDark);
-
-};
-
-if(localStorage.getItem("koukiDarkMode") === "true"){
-  document.body.classList.add("dark");
-}
-
 async function loadCSV(url){
 
   const text = await fetch(url).then(r=>r.text());
@@ -592,6 +596,7 @@ if ("serviceWorker" in navigator) {
 }
 
 setupAutoMasterSetting();
+setupDarkModeSetting();
 loadCategories();
 setupMasterButton();
 
