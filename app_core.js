@@ -12,6 +12,21 @@ let currentQuiz = 0;
 let score = 0;
 let quizList = [];
 let wrongQuestions = JSON.parse(localStorage.getItem("koukiWrongQuestions")) || [];
+// 過去に保存した復習問題からも選択肢先頭の丸数字を除く。
+let savedChoicesUpdated = false;
+wrongQuestions.forEach(quiz => {
+  if (!Array.isArray(quiz.choices)) return;
+  quiz.choices = quiz.choices.map(choice => {
+    if (typeof choice !== "string") return choice;
+    const cleanedChoice = choice.replace(/^\s*[①-⑳❶-❿]\s*/u, "");
+    if (cleanedChoice !== choice) savedChoicesUpdated = true;
+    return cleanedChoice;
+  });
+});
+if (savedChoicesUpdated) {
+  localStorage.setItem("koukiWrongQuestions", JSON.stringify(wrongQuestions));
+}
+
 let masteredQuestions =  JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [];
 let retryMode = false;
 let currentChoiceOrder = [];
