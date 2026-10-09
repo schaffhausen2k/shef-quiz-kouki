@@ -34,8 +34,14 @@ let currentChoiceOrder = [];
 // この端末での設定を保持。未設定時はオフ。
 const AUTO_MASTER_KEY = "koukiAutoMasterOnCorrect";
 function setupAutoMasterSetting(){
+  // 古いHTMLがキャッシュに残っていても、新しい設定UIを補って起動する。
+  if(!document.getElementById("autoMasterToggle")){
+    const container = document.querySelector(".container");
+    if(container) container.insertAdjacentHTML("afterbegin", "<details id=\"quizSettings\" class=\"quiz-settings\">\n  <summary>⚙ 設定 <span id=\"autoMasterStatus\" class=\"settings-status\">自動で覚えた：オフ</span></summary>\n  <label class=\"auto-master-setting\" for=\"autoMasterToggle\">\n    <span>正解した問題を自動で「覚えた」にする</span>\n    <input type=\"checkbox\" id=\"autoMasterToggle\" role=\"switch\" aria-describedby=\"autoMasterHelp\">\n  </label>\n  <p id=\"autoMasterHelp\">オンにすると、正解した問題は次回の出題から外れます。途中でも変更でき、次の採点から適用されます。自動登録後も「覚えた済み」ボタンで解除できます。</p>\n</details>");
+  }
   const toggle = document.getElementById("autoMasterToggle");
   const status = document.getElementById("autoMasterStatus");
+  if(!toggle || !status) return;
   toggle.checked = localStorage.getItem(AUTO_MASTER_KEY) === "true";
   const updateStatus = () => {
     status.textContent = "自動で覚えた：" + (toggle.checked ? "オン" : "オフ");
