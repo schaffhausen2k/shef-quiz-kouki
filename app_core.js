@@ -1,36 +1,4 @@
-const APP_CONTENT_VERSION = "20260921-kouki-14";
-
-/*
-  問題ファイル更新時のキャッシュ対策。
-  「覚えた問題」「間違えた問題」「成績」などのlocalStorageは削除しません。
-*/
-(async function refreshQuestionFileCache() {
-  const versionKey = "koukiQuizAppContentVersion";
-
-  if (localStorage.getItem(versionKey) === APP_CONTENT_VERSION) return;
-
-  try {
-    if ("serviceWorker" in navigator) {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map(registration => registration.unregister()));
-    }
-
-    if ("caches" in window) {
-      const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
-    }
-  } catch (error) {
-    console.warn("キャッシュの更新処理に失敗しました。", error);
-  }
-
-  localStorage.setItem(versionKey, APP_CONTENT_VERSION);
-
-  const url = new URL(window.location.href);
-  url.searchParams.set("v", APP_CONTENT_VERSION);
-  window.location.replace(url.toString());
-})();
-
-
+// 起動時の更新確認とキャッシュ管理はindex.htmlに集約。
 const questionData = {
   "調理理論（グローバル）": globalChoririronQuestions,
   "調理理論": choririronQuestions,
