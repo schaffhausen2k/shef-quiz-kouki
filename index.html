@@ -30,14 +30,28 @@ html.app-loading body:not(.auth-locked) .container { visibility: hidden !importa
 html.app-loading body.auth-locked #passwordGate { visibility: visible !important; }
 body.auth-locked .container { display: none !important; }
 #passwordGate { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; box-sizing:border-box; background:linear-gradient(135deg,#dff3ef,#ffffff); }
-.password-card { width:100%; max-width:420px; background:#ffffff; border-radius:18px; padding:28px; box-shadow:0 12px 30px rgba(0,0,0,.14); text-align:center; }
-.password-card h1 { margin:0 0 10px; font-size:24px; color:#00695c; }
-.password-card p { margin:0 0 18px; color:#555; line-height:1.6; }
+.password-card { width:100%; max-width:420px; background:#ffffff; border-radius:18px; padding:28px 24px 24px; box-shadow:0 12px 30px rgba(0,0,0,.14); text-align:center; color:#18302d; }
+.password-card h1 { margin:0 0 22px; font-size:24px; line-height:1.4; color:#00695c; }
+.password-card .password-subtitle { display:block; margin-top:6px; font-size:18px; }
+.password-card p { margin:0; color:#555; line-height:1.75; word-break:normal; line-break:strict; overflow-wrap:break-word; }
+.password-card .password-intro { margin-bottom:10px; font-size:15px; }
+.password-intro span { display:block; }
+.password-card .password-help { margin-bottom:22px; font-size:13px; color:#667772; }
+.password-help span { display:inline-block; }
+.password-card .password-notice { margin-top:20px; padding-top:16px; border-top:1px solid #e0eae6; text-align:left; }
+.password-card .password-notice p { color:#b3261e; font-size:13px; line-height:1.8; text-wrap:pretty; }
+.password-card .password-notice p + p { margin-top:10px; }
+@media (max-width:360px) {
+  #passwordGate { padding:16px; }
+  .password-card { padding:24px 20px 20px; }
+  .password-card h1 { font-size:22px; }
+}
 #passwordInput { width:100%; box-sizing:border-box; padding:14px; font-size:16px; border:2px solid #9ccfc6; border-radius:10px; outline:none; }
 #passwordInput:focus { border-color:#00796b; }
 #loginBtn { width:100%; margin-top:14px; padding:14px; font-size:16px; font-weight:bold; color:#fff; background:#00796b; border:none; border-radius:10px; cursor:pointer; }
 #loginBtn:hover { opacity:.9; }
-#passwordError { min-height:22px; margin-top:12px; color:#d32f2f; font-weight:bold; }
+#passwordError { margin-top:12px; color:#d32f2f; font-weight:bold; font-size:14px; }
+#passwordError:empty { display:none; }
 body.auth-locked #passwordGate { display:flex !important; }
 body.auth-locked #themeToggle, body.auth-locked #quizArea, body.auth-locked #categoryArea, body.auth-locked #statsArea { display:none !important; }
 body:not(.auth-locked) #passwordGate { display:none !important; }
@@ -63,7 +77,20 @@ document.addEventListener('DOMContentLoaded', function () {
 </head>
 <body class="auth-locked">
 <noscript><div style="padding:16px;color:#b00020;font-weight:bold;text-align:center;">このアプリを使うにはJavaScriptを有効にしてください。</div></noscript>
-<div id="passwordGate"><div class="password-card"><h1>後期試験対策<br>（一問一答式）</h1><p>クラス共通のパスワードを入力してください。<br>一度入力すると、次回からは入力不要です。</p><input type="password" id="passwordInput" placeholder="パスワード" autocomplete="current-password"><button id="loginBtn" type="button">入る</button><p><span style="color:red;">アプリの動作および問題データの保証は致しません。あくまで自己責任でご利用ください。<br>作者と面識のある方のみの利用を想定しています。</span></p><div id="passwordError" aria-live="polite"></div></div></div>
+<div id="passwordGate">
+  <div class="password-card">
+    <h1>後期試験対策<span class="password-subtitle">（一問一答式）</span></h1>
+    <p class="password-intro"><span>クラス共通のパスワードを</span><span>入力してください。</span></p>
+    <p class="password-help"><span>一度入力すると、</span><span>次回からは入力不要です。</span></p>
+    <input type="password" id="passwordInput" placeholder="パスワード" autocomplete="current-password" aria-label="パスワード">
+    <button id="loginBtn" type="button">入る</button>
+    <div id="passwordError" aria-live="polite"></div>
+    <div class="password-notice">
+      <p>アプリの動作および問題データの保証は致しません。あくまで自己責任でご利用ください。</p>
+      <p>作者と面識のある方のみの利用を想定しています。</p>
+    </div>
+  </div>
+</div>
 <div class="container"><details id="quizSettings" class="quiz-settings">
   <summary>⚙ 設定 <span id="autoMasterStatus" class="settings-status">自動で覚えた：オフ</span></summary>
   <label class="auto-master-setting" for="autoMasterToggle">
