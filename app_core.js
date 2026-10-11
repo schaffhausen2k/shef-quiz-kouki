@@ -161,46 +161,23 @@ if(quizList.length === 0){
 
 area.appendChild(retryBtn);
 
-const clearMasterBtn =
-  document.createElement("button");
-
-clearMasterBtn.innerText =
-  "覚えた問題を全解除";
-
-clearMasterBtn.onclick = ()=>{
-  showAppConfirm({
-    title: "覚えた問題を全解除",
-    message: "覚えた問題をすべて解除しますか？",
-    confirmText: "全解除する",
-    cancelText: "キャンセル",
-    danger: true,
-    onConfirm: () => {
-      masteredQuestions = [];
-      localStorage.setItem(
-        "koukiMasteredQuestions",
-        JSON.stringify([])
-      );
-      showAppNotice("覚えた問題をすべて解除しました", "success");
-      loadCategories();
-    }
-  });
-};
-
-area.appendChild(clearMasterBtn);
-
 const categoryReset = document.createElement("details");
 categoryReset.className = "category-master-reset";
 const summary = document.createElement("summary");
-summary.textContent = "カテゴリごとに「覚えた」を解除";
+summary.textContent = "「覚えた」を解除";
 categoryReset.appendChild(summary);
 
 const label = document.createElement("label");
 label.htmlFor = "masterResetCategory";
-label.textContent = "解除するカテゴリ";
+label.textContent = "解除する対象";
 categoryReset.appendChild(label);
 
 const select = document.createElement("select");
 select.id = "masterResetCategory";
+const allOption = document.createElement("option");
+allOption.value = "";
+allOption.textContent = "全カテゴリ";
+select.appendChild(allOption);
 Object.keys(questionData).forEach(category => {
   const option = document.createElement("option");
   option.value = category;
@@ -215,11 +192,11 @@ categoryReset.appendChild(count);
 
 const resetBtn = document.createElement("button");
 resetBtn.type = "button";
-resetBtn.textContent = "このカテゴリの「覚えた」を解除";
+resetBtn.textContent = "選んだ対象の「覚えた」を解除";
 const updateResetCount = () => {
   const saved = JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [];
-  const questions = new Set(questionData[select.value].map(q => q.question));
-  const total = new Set(saved.filter(q => questions.has(q))).size;
+  const questions = new Set((questionData[select.value] || []).map(q => q.question));
+  const total = new Set(select.value === "" ? saved : saved.filter(q => questions.has(q))).size;
   count.textContent = "覚えた問題：" + total + "問";
   resetBtn.disabled = total === 0;
 };
@@ -234,26 +211,29 @@ area.appendChild(categoryReset);
 
 
 function confirmCategoryMasterReset(category){
+  const allCategories = category === "";
+  const target = allCategories ? "全カテゴリ" : category;
   const questions = new Set((questionData[category] || []).map(q => q.question));
   const saved = JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [];
-  const count = new Set(saved.filter(q => questions.has(q))).size;
+  const count = new Set(allCategories ? saved : saved.filter(q => questions.has(q))).size;
   if(count === 0){
-    showAppNotice("このカテゴリに覚えた問題はありません", "info");
+    showAppNotice("選んだ対象に覚えた問題はありません", "info");
     return;
   }
   showAppConfirm({
-    title: "カテゴリの「覚えた」を解除",
-    message: "「" + category + "」の覚えた問題 " + count + "問を解除しますか？",
-    confirmText: "このカテゴリを解除",
+    title: "「覚えた」を解除",
+    message: "「" + target + "」の覚えた問題 " + count + "問を解除しますか？",
+    confirmText: "解除する",
     cancelText: "キャンセル",
     danger: true,
     onConfirm: () => {
       // 確認中の変更も保持するため、保存状態を取り直す。
-      masteredQuestions = (JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [])
-        .filter(q => !questions.has(q));
+      masteredQuestions = allCategories ? [] :
+        (JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [])
+          .filter(q => !questions.has(q));
       localStorage.setItem("koukiMasteredQuestions", JSON.stringify(masteredQuestions));
       loadCategories();
-      showAppNotice("「" + category + "」の覚えた登録を解除しました", "success");
+      showAppNotice("「" + target + "」の覚えた登録を解除しました", "success");
     }
   });
 }
