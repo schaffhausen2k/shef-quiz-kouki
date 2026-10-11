@@ -188,6 +188,74 @@ clearMasterBtn.onclick = ()=>{
 
 area.appendChild(clearMasterBtn);
 
+const categoryReset = document.createElement("details");
+categoryReset.className = "category-master-reset";
+const summary = document.createElement("summary");
+summary.textContent = "カテゴリごとに「覚えた」を解除";
+categoryReset.appendChild(summary);
+
+const label = document.createElement("label");
+label.htmlFor = "masterResetCategory";
+label.textContent = "解除するカテゴリ";
+categoryReset.appendChild(label);
+
+const select = document.createElement("select");
+select.id = "masterResetCategory";
+Object.keys(questionData).forEach(category => {
+  const option = document.createElement("option");
+  option.value = category;
+  option.textContent = category;
+  select.appendChild(option);
+});
+categoryReset.appendChild(select);
+
+const count = document.createElement("p");
+count.setAttribute("aria-live", "polite");
+categoryReset.appendChild(count);
+
+const resetBtn = document.createElement("button");
+resetBtn.type = "button";
+resetBtn.textContent = "このカテゴリの「覚えた」を解除";
+const updateResetCount = () => {
+  const saved = JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [];
+  const questions = new Set(questionData[select.value].map(q => q.question));
+  const total = new Set(saved.filter(q => questions.has(q))).size;
+  count.textContent = "覚えた問題：" + total + "問";
+  resetBtn.disabled = total === 0;
+};
+select.addEventListener("change", updateResetCount);
+resetBtn.onclick = () => confirmCategoryMasterReset(select.value);
+categoryReset.appendChild(resetBtn);
+updateResetCount();
+area.appendChild(categoryReset);
+
+
+}
+
+
+function confirmCategoryMasterReset(category){
+  const questions = new Set((questionData[category] || []).map(q => q.question));
+  const saved = JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [];
+  const count = new Set(saved.filter(q => questions.has(q))).size;
+  if(count === 0){
+    showAppNotice("このカテゴリに覚えた問題はありません", "info");
+    return;
+  }
+  showAppConfirm({
+    title: "カテゴリの「覚えた」を解除",
+    message: "「" + category + "」の覚えた問題 " + count + "問を解除しますか？",
+    confirmText: "このカテゴリを解除",
+    cancelText: "キャンセル",
+    danger: true,
+    onConfirm: () => {
+      // 確認中の変更も保持するため、保存状態を取り直す。
+      masteredQuestions = (JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [])
+        .filter(q => !questions.has(q));
+      localStorage.setItem("koukiMasteredQuestions", JSON.stringify(masteredQuestions));
+      loadCategories();
+      showAppNotice("「" + category + "」の覚えた登録を解除しました", "success");
+    }
+  });
 }
 
 function startQuiz(category){
