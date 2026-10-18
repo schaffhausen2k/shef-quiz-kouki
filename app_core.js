@@ -161,10 +161,6 @@ function loadCategories(){
     cards.appendChild(btn);
   });
   area.appendChild(cards);
-  const help = document.createElement("p");
-  help.className = "category-progress-help";
-  help.textContent = "「覚えた」を付けると、残りの問題が減ります。";
-  area.appendChild(help);
 
 // 間違えた問題だけ再挑戦
 const retryBtn = document.createElement("button");
