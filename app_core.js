@@ -126,7 +126,7 @@ function loadCategories(){
   const settings = document.getElementById("quizSettings");
   // 同じ設定要素を移動し、スイッチの状態とイベントを保持する。
   if(settings) settings.remove();
-  area.innerHTML = '<div class="category-header"><h2>カテゴリ選択（後期）</h2></div><p class="category-message">解く問題が減った！をやる気に変えよう。</p>';
+  area.innerHTML = '<div class="category-header"><h2>カテゴリ選択（後期）</h2></div>';
   if(settings){
     arrangeCategorySettings(settings);
     area.querySelector(".category-header").appendChild(settings);
