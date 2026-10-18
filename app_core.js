@@ -80,28 +80,91 @@ function shuffle(array){
 function setSettingsVisible(visible){
   const settings = document.getElementById("quizSettings");
   if(settings) settings.style.display = visible ? "" : "none";
+  if(settings && !visible) settings.open = false;
+  document.body.classList.toggle("category-screen", visible);
+}
+
+// 出題時と同じ「問題文」の保存キーで、現在のデータに対する進捗を計算する。
+function getCategoryProgress(questions, mastered){
+  const total = questions.length;
+  const learned = questions.filter(q => mastered.has(q.question)).length;
+  return {
+    total,
+    learned,
+    remaining: total - learned,
+    percentage: total === 0 ? 0 : Math.round(learned / total * 100)
+  };
+}
+
+function arrangeCategorySettings(settings){
+  if(!settings || settings.querySelector(".settings-panel")) return;
+  const summary = settings.querySelector("summary");
+  const panel = document.createElement("div");
+  panel.className = "settings-panel";
+  const status = summary.querySelector("#autoMasterStatus");
+  if(status) panel.appendChild(status);
+  Array.from(settings.childNodes).forEach(node => {
+    if(node !== summary) panel.appendChild(node);
+  });
+  summary.innerHTML = '<span class="settings-icon" aria-hidden="true">⚙</span><span>設定</span>';
+  settings.appendChild(panel);
+  document.addEventListener("click", event => {
+    if(settings.open && !settings.contains(event.target)) settings.open = false;
+  });
+  settings.addEventListener("keydown", event => {
+    if(event.key === "Escape"){
+      settings.open = false;
+      summary.focus();
+    }
+  });
 }
 
 function loadCategories(){
   setSettingsVisible(true);
 
   const area = document.getElementById("categoryArea");
-
-  area.innerHTML = "<h2>カテゴリ選択(後期)</h2>";
-
+  const settings = document.getElementById("quizSettings");
+  // 同じ設定要素を移動し、スイッチの状態とイベントを保持する。
+  if(settings) settings.remove();
+  area.innerHTML = '<div class="category-header"><h2>カテゴリ選択（後期）</h2></div><p class="category-message">解く問題が減った！をやる気に変えよう。</p>';
+  if(settings){
+    arrangeCategorySettings(settings);
+    area.querySelector(".category-header").appendChild(settings);
+  }
+  masteredQuestions = JSON.parse(localStorage.getItem("koukiMasteredQuestions")) || [];
+  const mastered = new Set(masteredQuestions);
+  const cards = document.createElement("div");
+  cards.className = "category-cards";
   Object.keys(questionData).forEach(category => {
-
+    const progress = getCategoryProgress(questionData[category], mastered);
     const btn = document.createElement("button");
-
+    btn.type = "button";
     btn.className = "categoryBtn";
-
-    btn.innerText = category;
-
+    const name = document.createElement("span");
+    name.className = "category-name";
+    name.textContent = category;
+    btn.appendChild(name);
+    const counts = document.createElement("span");
+    counts.className = "category-counts";
+    counts.textContent = `全${progress.total}問 ｜ 覚えた${progress.learned}問`;
+    btn.appendChild(counts);
+    const remaining = document.createElement("span");
+    remaining.className = "category-remaining";
+    remaining.innerHTML = `残り <strong>${progress.remaining}</strong>問<span class="category-chevron" aria-hidden="true">›</span>`;
+    btn.appendChild(remaining);
+    const meter = document.createElement("span");
+    meter.className = "category-meter";
+    meter.innerHTML = `<span class="category-meter-label">覚えた割合 <strong>${progress.percentage}％</strong></span><span class="category-meter-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.percentage}"><span class="category-meter-fill" style="width:${progress.percentage}%"></span></span>`;
+    meter.querySelector('[role="progressbar"]').setAttribute("aria-label", category + "の覚えた割合");
+    btn.appendChild(meter);
     btn.onclick = () => startQuiz(category);
-
-    area.appendChild(btn);
-
+    cards.appendChild(btn);
   });
+  area.appendChild(cards);
+  const help = document.createElement("p");
+  help.className = "category-progress-help";
+  help.textContent = "「覚えた」を付けると、残りの問題が減ります。";
+  area.appendChild(help);
 
 // 間違えた問題だけ再挑戦
 const retryBtn = document.createElement("button");
@@ -916,3 +979,4 @@ function setupMasterButton(){
   };
 
 }
+
