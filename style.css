@@ -509,8 +509,10 @@ body.dark .category-cards .categoryBtn{background:var(--card);color:var(--text);
 body.dark .category-cards .categoryBtn:hover{background:var(--primary-soft);}
 .category-name{
   grid-column:1 / -1;
-  font-size:17px;
-  line-height:1.25;
+  font-size:19px;
+  font-weight:800;
+  color:var(--primary-strong);
+  line-height:1.2;
   overflow-wrap:anywhere;
 }
 .category-counts{
@@ -550,8 +552,8 @@ button:focus-visible,.quiz-settings summary:focus-visible{outline:3px solid var(
   .category-header .quiz-settings summary{min-width:48px;min-height:48px;padding:4px 7px;}
   .settings-icon{font-size:21px;}
   .category-cards{gap:7px;}
-  .category-cards .categoryBtn{padding:8px 12px;gap:2px 8px;}
-  .category-name{font-size:16px;}
+  .category-cards .categoryBtn{padding:7px 12px;gap:2px 8px;}
+  .category-name{font-size:18px;}
 }
 @media(max-width:359px){
   .category-counts{font-size:11px;}
