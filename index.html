@@ -112,7 +112,21 @@ document.addEventListener('DOMContentLoaded', function () {
   // 全ファイルを同時に取得し、async=falseで元の順序どおりに実行する。
   function loadScript(src){return new Promise((resolve,reject)=>{const script=document.createElement("script");script.src=src;script.async=false;script.onload=resolve;script.onerror=()=>reject(new Error(`${src} を読み込めませんでした`));document.body.appendChild(script);});}
   let serverVersion;try{serverVersion=await getServerVersion();}catch(error){console.warn("更新番号を取得できなかったため、保存済み番号で起動します",error);serverVersion=localStorage.getItem(VERSION_STORAGE_KEY)||"fallback-1";}
-  const savedVersion=localStorage.getItem(VERSION_STORAGE_KEY);if(savedVersion&&savedVersion!==serverVersion)await clearBrowserCaches();window.__APP_SERVER_VERSION__=serverVersion;const encodedVersion=encodeURIComponent(serverVersion);const stylesheet=document.getElementById("appStylesheet");if(stylesheet)stylesheet.href=`style.css?v=${encodedVersion}`;
+  const savedVersion=localStorage.getItem(VERSION_STORAGE_KEY);
+  if(savedVersion&&savedVersion!==serverVersion){
+    await clearBrowserCaches();
+    // Reload the document itself before loading scripts: an old document carries an old assetFiles list.
+    const reloadKey="koukiShellRefresh_"+serverVersion;
+    if(sessionStorage.getItem(reloadKey)!=="done"){
+      sessionStorage.setItem(reloadKey,"done");
+      const refreshed=new URL(location.href);
+      refreshed.searchParams.set("appVersion",serverVersion);
+      refreshed.searchParams.set("shellRefresh",String(Date.now()));
+      location.replace(refreshed.toString());
+      return;
+    }
+  }
+  window.__APP_SERVER_VERSION__=serverVersion;const encodedVersion=encodeURIComponent(serverVersion);const stylesheet=document.getElementById("appStylesheet");if(stylesheet)stylesheet.href=`style.css?v=${encodedVersion}`;
   try{await Promise.all(assetFiles.map(file=>loadScript(`${file}?v=${encodedVersion}`)));await loadScript(`app_core.js?v=${encodedVersion}`);localStorage.setItem(VERSION_STORAGE_KEY,serverVersion);requestAnimationFrame(()=>{document.documentElement.classList.remove("app-loading");});}catch(error){console.error(error);document.body.insertAdjacentHTML("afterbegin",'<div style="padding:14px;background:#b71c1c;color:white;text-align:center;font-weight:bold;">最新版の読み込みに失敗しました。通信状態を確認して再読み込みしてください。</div>');document.documentElement.classList.remove("app-loading");return;}
   let checking=false;async function checkForServerUpdate(){if(checking)return;checking=true;try{const latestVersion=await getServerVersion();if(latestVersion!==serverVersion){await clearBrowserCaches();localStorage.setItem(VERSION_STORAGE_KEY,latestVersion);const url=new URL(location.href);url.searchParams.set("appVersion",latestVersion);location.replace(url.toString());}}catch(error){console.warn("更新確認に失敗しました",error);}finally{checking=false;}}
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")checkForServerUpdate();});window.addEventListener("pageshow",checkForServerUpdate);setInterval(checkForServerUpdate,CHECK_INTERVAL_MS);
