@@ -1,5 +1,6 @@
 // 起動時の更新確認とキャッシュ管理はindex.htmlに集約。
 const questionData = {
+  ...((typeof window !== "undefined" && window.koukiSpecialQuestionData) || {}),
   "調理理論（グローバル）": globalChoririronQuestions,
   "調理理論": choririronQuestions,
   "フードセーフティ論": foodsafetyQuestions,
@@ -30,7 +31,7 @@ const questionData = {
     .replace(/\s+/g,"");
  }
  function keywordTerms(value){
-   return [...new Set(value.trim().split(/[\s、,，]+/).map(normalizeKeyword).filter(Boolean))];
+   return [...new Set((value.trim().match(/"[^"]+"|[^\s、,，]+/g)||[]).map(v=>normalizeKeyword(v.replace(/^"|"$/g,""))).filter(Boolean))];
  }
  function keywordVariants(term){
    const group=keywordSynonyms.find(g=>g.some(v=>normalizeKeyword(v)===term));
@@ -39,7 +40,7 @@ const questionData = {
  function keywordMatches(question, terms, mode){
    const fields=[question.question,...(question.choices||[]),question.explanation,
      ...Object.values(question.choiceExplanations||{})].map(v=>normalizeKeyword(String(v??"").replace(/<[^>]*>/g,"")));
-   const hit=term=>keywordVariants(term).some(v=>fields.some(field=>field.includes(v)));
+   const hit=term=>keywordVariants(term).some(v=>fields.some(field=>{let pos=field.indexOf(v);while(pos!==-1){if(!/\d$/.test(v)||!/^\d/.test(field.slice(pos+v.length)))return true;pos=field.indexOf(v,pos+1);}return false;}));
    return terms.length>0 && (mode==="and"?terms.every(hit):terms.some(hit));
  }
  const KEYWORD_HISTORY_KEY="koukiKeywordHistory";
@@ -232,7 +233,7 @@ function loadCategories(){
   const mastered = new Set(masteredQuestions);
   const cards = document.createElement("div");
   cards.className = "category-cards";
-  Object.keys(questionData).forEach(category => {
+  Object.keys(questionData).filter(category=>questionData[category].length>0).forEach(category => {
     const progress = getCategoryProgress(questionData[category], mastered);
     const btn = document.createElement("button");
     btn.type = "button";
