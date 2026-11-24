@@ -561,3 +561,22 @@ button:focus-visible,.quiz-settings summary:focus-visible{outline:3px solid var(
   .category-meter{gap:8px;}
 }
 
+
+/* キーワード学習：通常カテゴリ一覧の下にコンパクトに配置 */
+.keyword-study-btn{margin-top:8px;padding:10px 12px;min-height:44px;background:var(--primary-soft);color:var(--primary-strong);border:1px solid var(--border);font-weight:700;text-align:left}
+.keyword-panel{padding:12px;border:1px solid var(--border);border-radius:14px;background:var(--card);color:var(--text)}
+.keyword-panel h2{margin:0 0 16px;color:var(--primary-strong)}
+.keyword-panel form{display:grid;gap:10px}
+.keyword-panel form>label{font-weight:700}
+.keyword-panel input[type=search],.keyword-panel select{width:100%;min-height:44px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:16px}
+.keyword-panel small{color:var(--muted);line-height:1.5}
+.keyword-panel fieldset{margin:0;padding:10px;border:1px solid var(--border);border-radius:8px;min-width:0}
+.keyword-panel fieldset label{display:block;padding:5px 0}
+.keyword-panel input[type=checkbox],.keyword-panel input[type=radio]{accent-color:var(--primary);width:18px;height:18px;vertical-align:middle}
+.keyword-panel .keyword-check{font-weight:normal}
+#keywordHistory{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+#keywordHistory small{width:100%}
+#keywordHistory button{width:auto;max-width:100%;overflow-wrap:anywhere;margin:0;padding:7px 10px;font-size:13px;background:var(--primary-soft);color:var(--text);border:1px solid var(--border)}
+#keywordCount{margin:0;padding:10px;background:var(--primary-soft);border-radius:8px;font-size:14px;line-height:1.6;font-weight:700}
+#keywordStart{margin:0}
+#keywordStart:disabled{opacity:.45;cursor:default}
