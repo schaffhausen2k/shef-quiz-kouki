@@ -8,6 +8,103 @@ const questionData = {
   "ヘルシーライフ研究": healthylifeQuestions
 };
 
+
+ // キーワード学習：既存問題を参照し、覚えた・採点履歴を共有する。
+ const keywordSynonyms = [
+ ["重曹","炭酸水素ナトリウム","炭酸水素Na","重炭酸ナトリウム"],
+ ["ビタミンB1","チアミン"],["ビタミンB2","リボフラビン"],
+ ["ビタミンC","アスコルビン酸"],["ビタミンB6","ピリドキシン"],
+ ["HACCP","ハサップ"],["うま味","旨味","旨み","うまみ"],
+ ["ミョウバン","明礬","みょうばん"],["食塩","塩化ナトリウム","塩化Na"],
+ ["ベーキングパウダー","ベイキングパウダー"],
+ ["グルテンフリー","グルテン・フリー","gluten free","gluten-free"],
+ ["アレルギー","アレルギィ"],["ノロウイルス","ノロウィルス"],
+ ["腸炎ビブリオ","腸炎ヴィブリオ"],["黄色ブドウ球菌","黄色ぶどう球菌"],
+ ["食物繊維","dietary fiber"],["たんぱく質","タンパク質","蛋白質"],
+ ["二酸化炭素","炭酸ガス","CO2"],
+ ["脂質","リピッド"],["メイラード反応","メーラード反応","アミノカルボニル反応"]
+ ];
+ function normalizeKeyword(value){
+   return String(value ?? "").normalize("NFKC").toLowerCase()
+    .replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-96))
+    .replace(/\s+/g,"");
+ }
+ function keywordTerms(value){
+   return [...new Set(value.trim().split(/[\s、,，]+/).map(normalizeKeyword).filter(Boolean))];
+ }
+ function keywordVariants(term){
+   const group=keywordSynonyms.find(g=>g.some(v=>normalizeKeyword(v)===term));
+   return group ? [...new Set(group.map(normalizeKeyword))] : [term];
+ }
+ function keywordMatches(question, terms, mode){
+   const fields=[question.question,...(question.choices||[]),question.explanation,
+     ...Object.values(question.choiceExplanations||{})].map(v=>normalizeKeyword(String(v??"").replace(/<[^>]*>/g,"")));
+   const hit=term=>keywordVariants(term).some(v=>fields.some(field=>field.includes(v)));
+   return terms.length>0 && (mode==="and"?terms.every(hit):terms.some(hit));
+ }
+ const KEYWORD_HISTORY_KEY="koukiKeywordHistory";
+ function readKeywordHistory(){
+   try {const h=JSON.parse(localStorage.getItem(KEYWORD_HISTORY_KEY)||"[]");return Array.isArray(h)?h.filter(v=>typeof v==="string").slice(0,10):[];}catch{return [];}
+ }
+ function uniqueQuizQuestions(questions){
+   // 同じ問題文・選択肢の問題を一度だけ出題。既存の履歴キーは変更しない。
+   const seen=new Set();
+   return questions.filter(q=>{const key=JSON.stringify([q.question,[...(q.choices||[])].sort()]);if(seen.has(key))return false;seen.add(key);return true;});
+ }
+ function openKeywordStudy(){
+   const area=document.getElementById("categoryArea");
+   const settings=document.getElementById("quizSettings");
+   if(settings) settings.remove();
+   setSettingsVisible(false);
+   area.innerHTML='<section class="keyword-panel"><h2>キーワード学習</h2><form id="keywordForm"><label for="keywordInput">復習したいキーワード</label><input id="keywordInput" type="search" autocomplete="off" placeholder="例：重曹、HACCP" maxlength="200"><small>空白・読点で複数指定。類義語・表記ゆれも検索します。</small><div id="keywordHistory"></div><label for="keywordCategory">検索対象カテゴリ</label><select id="keywordCategory"><option value="">すべてのカテゴリ</option></select><fieldset><legend>複数キーワードの条件</legend><label><input type="radio" name="keywordMode" value="or" checked> いずれかを含む（OR）</label><label><input type="radio" name="keywordMode" value="and"> すべてを含む（AND）</label></fieldset><label class="keyword-check"><input type="checkbox" id="keywordExclude" checked> 「覚えた」問題を除外する</label><p id="keywordCount" aria-live="polite"></p><button type="submit" class="nextBtn" id="keywordStart" disabled>学習を開始する</button></form><button type="button" class="backBtn" id="keywordBack">カテゴリ選択へ戻る</button></section>';
+   if(settings){area.appendChild(settings);settings.style.display="none";}
+   const input=document.getElementById("keywordInput");
+   const category=document.getElementById("keywordCategory");
+   const form=document.getElementById("keywordForm");
+   const exclude=document.getElementById("keywordExclude");
+   const count=document.getElementById("keywordCount");
+   const start=document.getElementById("keywordStart");
+   const history=document.getElementById("keywordHistory");
+   Object.keys(questionData).filter(k=>questionData[k].length).forEach(k=>{
+     const option=document.createElement("option");option.value=k;option.textContent=k;category.appendChild(option);
+   });
+   let matches=[];
+   function refresh(){
+     const terms=keywordTerms(input.value);
+     const mode=form.elements.keywordMode.value;
+     const source=category.value?questionData[category.value]:Object.values(questionData).flat();
+     const all=uniqueQuizQuestions(source.filter(q=>keywordMatches(q,terms,mode)));
+     const mastered=new Set(JSON.parse(localStorage.getItem("koukiMasteredQuestions")||"[]"));
+     const progress=getCategoryProgress(all,mastered);
+     matches=exclude.checked?all.filter(q=>!mastered.has(q.question)):all;
+     count.textContent=terms.length?"該当 "+all.length+"問 ｜ 覚えた "+progress.learned+"問（"+progress.percentage+"％）｜ 出題 "+matches.length+"問":"キーワードを入力してください";
+     start.disabled=!matches.length;
+   }
+   function renderHistory(){
+     history.replaceChildren();
+     const saved=readKeywordHistory();
+     const words=saved.length?saved:["重曹","膨張剤","食品添加物","ベーキングパウダー"];
+     const title=document.createElement("small");title.textContent=saved.length?"最近の検索":"検索例";history.appendChild(title);
+     words.forEach(word=>{const b=document.createElement("button");b.type="button";b.textContent=word;b.onclick=()=>{input.value=word;refresh();};history.appendChild(b);});
+     if(saved.length){const b=document.createElement("button");b.type="button";b.textContent="履歴を消去";b.onclick=()=>{localStorage.removeItem(KEYWORD_HISTORY_KEY);renderHistory();};history.appendChild(b);}
+   }
+   form.addEventListener("input",refresh);
+   form.addEventListener("change",refresh);
+   form.addEventListener("submit",event=>{
+     event.preventDefault();refresh();if(!matches.length)return;
+     const word=input.value.trim();
+     localStorage.setItem(KEYWORD_HISTORY_KEY,JSON.stringify([word,...readKeywordHistory().filter(v=>v!==word)].slice(0,10)));
+     masteredQuestions=JSON.parse(localStorage.getItem("koukiMasteredQuestions")||"[]");
+     retryMode=false;quizList=shuffle(matches);currentQuiz=0;score=0;
+     area.style.display="none";document.getElementById("quizArea").style.display="block";
+     document.getElementById("categoryTitle").textContent="キーワード学習："+word;
+     document.getElementById("backCategoryBtn").style.display="block";
+     loadQuiz();window.scrollTo({top:0,behavior:"auto"});
+   });
+   document.getElementById("keywordBack").onclick=()=>{loadCategories();window.scrollTo({top:0,behavior:"auto"});};
+   renderHistory();refresh();window.scrollTo({top:0,behavior:"auto"});
+ }
+
 let currentQuiz = 0;
 let score = 0;
 let quizList = [];
@@ -161,6 +258,12 @@ function loadCategories(){
     cards.appendChild(btn);
   });
   area.appendChild(cards);
+  const keywordButton=document.createElement("button");
+  keywordButton.type="button";
+  keywordButton.className="keyword-study-btn";
+  keywordButton.textContent="⌕ キーワード学習 ›";
+  keywordButton.onclick=openKeywordStudy;
+  area.appendChild(keywordButton);
 
 // 間違えた問題だけ再挑戦
 const retryBtn = document.createElement("button");
